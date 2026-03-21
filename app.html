@@ -326,6 +326,16 @@
       opacity: 0.6;
     }
 
+    .alert-ai-warning {
+      background-color: rgba(186, 117, 23, 0.12);
+      border: 1px solid var(--warning);
+      color: var(--warning);
+      padding: 0.6rem 1rem;
+      font-size: 0.82rem;
+      text-align: center;
+      display: none;
+    }
+
     /* Tool / Perfil panel */
     .back-btn {
       display: inline-flex;
@@ -480,6 +490,9 @@
     <div class="chat-area" id="chat-area">
       <div class="chat-messages" id="chat-messages"></div>
       <div class="chat-footer">
+        <div id="ai-warning-banner" class="alert-ai-warning">
+          ⚠️ El servicio de IA no está configurado en este entorno. Las consultas no funcionarán hasta que se añadan las claves API en Cloudflare Pages.
+        </div>
         <div class="chat-disclaimer">
           ℹ️ GestorIA ofrece orientación general, no asesoría profesional certificada.
           <a href="/terminos.html" target="_blank" style="color: var(--accent); font-weight: 500;">Más info</a>
@@ -733,6 +746,27 @@
 
     mostrarSugerencias();
     cargarHistorialSidebar();
+
+    // ========================================================================
+    // CHECK ESTADO IA
+    // ========================================================================
+    (async () => {
+      try {
+        const res = await fetch('/api/config', { headers: { Accept: 'application/json' } });
+        const ct = res.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) throw new Error('no json');
+        const data = await res.json();
+        const activo = data?.providers?.groq || data?.providers?.mistral;
+        if (!activo) {
+          document.getElementById('ai-warning-banner').style.display = 'block';
+          btnEnviar.disabled = true;
+          chatInput.placeholder = 'IA no disponible — contacta con soporte.';
+        }
+      } catch {
+        // Sin conexión o CF Function no disponible — mostrar aviso
+        document.getElementById('ai-warning-banner').style.display = 'block';
+      }
+    })();
 
     btnEnviar.addEventListener('click', async () => {
       const texto = chatInput.value.trim();

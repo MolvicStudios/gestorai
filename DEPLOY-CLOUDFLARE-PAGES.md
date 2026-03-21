@@ -1,4 +1,134 @@
-# Deploy Checklist - GestorIA en Cloudflare Pages
+# Deploy Checklist — GestorIA en Cloudflare Pages
+> Actualizado: marzo 2026 — Arquitectura backend-proxy (sin claves en frontend)
+
+## ESTADO ACTUAL DEL REPOSITORIO
+
+```
+Rama local:   master
+Push destino: origin/main  (← PRODUCCIÓN en Cloudflare)
+Pull origen:  origin/main
+```
+
+**Todos los `git push` van automáticamente a `main` gracias a la config en `.git/config`.**
+
+---
+
+## 1) Estructura del repositorio
+
+```
+/
+├── index.html              ← Landing page
+├── login.html              ← Registro / Login
+├── onboarding.html         ← Perfil inicial
+├── app.html                ← App de chat
+├── _redirects              ← Rutas amigables (SIN catch-all)
+├── manifest.json           ← PWA
+├── sw.js                   ← Service Worker (cache gestorai-v7)
+├── css/main.css
+├── js/                     ← Módulos frontend
+│   ├── auth.js             ← Auth localStorage pura
+│   ├── chat.js             ← Motor chat
+│   ├── config.js           ← Temas + constantes
+│   ├── gdpr.js             ← Banner RGPD
+│   ├── groq.js             ← Proxy cliente → /api/chat
+│   ├── historial.js
+│   ├── perfil.js
+│   └── herramientas/       ← 6 calculadoras (cuota, irpf130, finiquito...)
+└── functions/              ← Cloudflare Pages Functions
+    ├── config.js           ← GET /config (estado providers, SIN claves)
+    └── api/
+        ├── config.js       ← GET /api/config (estado providers, SIN claves)
+        └── chat.js         ← POST /api/chat (proxy IA — único punto con claves)
+```
+
+---
+
+## 2) Configuración en Cloudflare Dashboard
+
+### Pages → gestorai → Settings → Builds & Deployments:
+- **Production branch:** `main`
+- **Framework preset:** None
+- **Build command:** (vacío)
+- **Build output directory:** `/` (raíz del repo)
+
+### Pages → gestorai → Settings → Environment Variables:
+Añadir en **Production** Y **Preview**:
+
+| Variable | Valor |
+|---|---|
+| `GROQ_API_KEY` | `gsk_xxxx...` (clave de console.groq.com) |
+| `MISTRAL_API_KEY` | `xxxx...` (clave de console.mistral.ai) |
+
+> ⚠️ **CRÍTICO**: Sin estas claves, `/api/chat` devuelve 503 y el chat no responde.
+> La app mostrará un banner de aviso si no detecta claves configuradas.
+
+---
+
+## 3) Flujo de despliegue
+
+```bash
+# Cualquier cambio
+git add -A
+git commit -m "descripción"
+git push
+# → va automáticamente a origin/main → Cloudflare despliega en PRODUCCIÓN
+```
+
+---
+
+## 4) Verificación post-deploy (smoke tests)
+
+### Rutas estáticas
+```
+GET /                     → 200 HTML (landing)
+GET /login.html           → 200 HTML
+GET /app.html             → 200 HTML
+GET /onboarding.html      → 200 HTML
+GET /robots.txt           → 200 text
+GET /sitemap.xml          → 200 XML
+GET /manifest.json        → 200 JSON
+GET /sw.js                → 200 JS
+```
+
+### Cloudflare Functions
+```
+GET  /api/config          → 200 {"providers":{"groq":true,"mistral":true}}
+GET  /config              → 200 {"providers":{"groq":true,"mistral":true}}
+POST /api/chat            → 200 {"content":"...respuesta IA...","provider":"groq"}
+```
+
+> Si `groq: false` y `mistral: false` → las claves NO están configuradas en Cloudflare.
+
+### Flujo funcional completo
+1. Abrir `https://gestorai.pro/`
+2. Click "Empieza gratis" → `/login.html?tab=registro`
+3. Registrar con email@test.com + contraseña ≥ 8 chars
+4. → Redirige a `/onboarding.html`
+5. Seleccionar situación laboral → "Comenzar →"
+6. → Redirige a `/app.html`
+7. Enviar "¿Cuánto pago de autónomo con 2.000€/mes?" → Respuesta de IA
+
+---
+
+## 5) Diagnóstico de problemas frecuentes
+
+| Síntoma | Causa probable | Solución |
+|---|---|---|
+| Deploy sale como "Preview" | Production branch no es `main` | Dashboard → Builds → Production branch = `main` |
+| Chat no responde | API keys no configuradas | Dashboard → Environment Variables → añadir keys |
+| Banner amarillo en app | `GET /api/config` devuelve FALSE | Ver fila anterior |
+| Error "SyntaxError Unexpected token '<'" | CF Function no desplegada | Verificar que `functions/api/chat.js` está en el repo |
+| Loop de redirecciones | Service Worker con cache old | DevTools → Application → Clear storage → Force reload |
+| Sitio no carga en móvil | SSL o dominio | Dashboard → Custom domains → verificar |
+
+---
+
+## 6) Pendientes antes de go-live
+
+- [ ] Completar NIF/CIF en `aviso-legal.html` (`[Completar por el propietario]`)
+- [ ] Unificar canonical URL: `index.html` → `gestorai.pro`, `sitemap.xml` → actualmente `gestorai.molvicstudios.com`
+- [ ] Configurar dominio personalizado `gestorai.pro` en Cloudflare DNS
+
 
 ## 1) Preparacion previa
 
