@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GestorIA — Configurar tu perfil</title>
+  <meta name="description" content="Completa de forma rápida tu perfil de usuario para personalizar las respuestas.">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--bg) 100%);
+    }
+
+    .onboarding-container {
+      width: 100%;
+      max-width: 500px;
+      padding: 2rem;
+    }
+
+    .onboarding-card {
+      background-color: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .onboarding-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .onboarding-logo {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .onboarding-header h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .onboarding-header p {
+      color: var(--text2);
+      font-size: 0.9rem;
+    }
+
+    .form-section {
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .form-section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .form-section label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .opcional {
+      font-weight: 400;
+      font-size: 0.85rem;
+      color: var(--text3);
+      margin-left: 0.5rem;
+    }
+
+    .option-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (min-width: 480px) {
+      .option-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .option-btn {
+      padding: 0.75rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      background-color: var(--bg);
+      color: var(--text);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition);
+      text-align: left;
+      white-space: normal;
+    }
+
+    .option-btn:hover {
+      border-color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    .option-btn.active {
+      background-color: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-family: var(--font-main);
+      font-size: 1rem;
+      color: var(--text);
+      background-color: var(--bg);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(29, 158, 117, 0.1);
+    }
+
+    .bloque-condicional {
+      display: none;
+      margin-top: 1rem;
+      padding: 1rem;
+      background-color: var(--bg2);
+      border-radius: var(--radius-md);
+      border-left: 3px solid var(--primary);
+    }
+
+    .bloque-condicional.show {
+      display: block;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      flex: 1;
+      padding: 0.75rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      font-size: 1rem;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+      flex: 1;
+      padding: 0.75rem;
+      background-color: var(--bg2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      font-size: 1rem;
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--bg3);
+      border-color: var(--border2);
+    }
+
+    .form-error {
+      display: none;
+      background-color: rgba(226, 75, 74, 0.1);
+      border-left: 3px solid var(--danger);
+      color: var(--danger);
+      padding: 0.75rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .form-error.show {
+      display: block;
+    }
+
+    .privacy-notice {
+      background-color: var(--accent-light);
+      border-left: 3px solid var(--accent);
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .privacy-notice strong {
+      color: var(--text);
+    }
+
+    @media (max-width: 480px) {
+      .onboarding-container {
+        padding: 1rem;
+      }
+
+      .onboarding-card {
+        padding: 1.5rem;
+      }
+
+      .option-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="onboarding-container">
+    <div class="onboarding-card">
+      <div class="onboarding-header">
+        <div class="onboarding-logo">🎯</div>
+        <h1>Personaliza tu perfil</h1>
+        <p>Nos conocemos mejor para ayudarte mejor</p>
+      </div>
+
+      <div class="privacy-notice">
+        <strong>🔒 Privacidad:</strong> Tus datos se guardan solo en este navegador.
+        Nunca se envían a servidores externos ni se comparten.
+      </div>
+
+      <form id="form-onboarding">
+        <div class="form-error" id="form-error"></div>
+
+        <!-- SITUACIÓN LABORAL (Obligatorio) -->
+        <div class="form-section">
+          <label>¿Cuál es tu situación laboral? <span class="opcional">Obligatorio</span></label>
+          <div class="option-grid">
+            <button type="button" class="option-btn" data-value="autonomo">
+              🏪 Soy autónomo
+            </button>
+            <button type="button" class="option-btn" data-value="asalariado">
+              👔 Trabajo por cuenta ajena
+            </button>
+            <button type="button" class="option-btn" data-value="desempleado">
+              📋 Estoy en desempleo
+            </button>
+            <button type="button" class="option-btn" data-value="empresario">
+              🏢 Tengo una empresa
+            </button>
+            <button type="button" class="option-btn" data-value="otro">
+              ❓ Otra situación
+            </button>
+          </div>
+          <input type="hidden" id="situacion" name="situacion" required>
+        </div>
+
+        <!-- CCAA -->
+        <div class="form-section">
+          <label for="ccaa">¿En qué comunidad autónoma resides? <span class="opcional">Opcional</span></label>
+          <select id="ccaa" name="ccaa" aria-label="Comunidad autonoma de residencia">
+            <option value="">— Prefiero no decirlo —</option>
+            <option value="Andalucía">Andalucía</option>
+            <option value="Aragón">Aragón</option>
+            <option value="Asturias">Asturias</option>
+            <option value="Balears (Illes)">Balears (Illes)</option>
+            <option value="Canarias">Canarias</option>
+            <option value="Cantabria">Cantabria</option>
+            <option value="Castilla y León">Castilla y León</option>
+            <option value="Castilla-La Mancha">Castilla-La Mancha</option>
+            <option value="Cataluña">Cataluña</option>
+            <option value="Ceuta">Ceuta</option>
+            <option value="Comunidad de Madrid">Comunidad de Madrid</option>
+            <option value="Comunidad Foral de Navarra">Comunidad Foral de Navarra</option>
+            <option value="Comunidad Valenciana">Comunidad Valenciana</option>
+            <option value="Extremadura">Extremadura</option>
+            <option value="Galicia">Galicia</option>
+            <option value="La Rioja">La Rioja</option>
+            <option value="Melilla">Melilla</option>
+            <option value="País Vasco">País Vasco</option>
+            <option value="Región de Murcia">Región de Murcia</option>
+          </select>
+        </div>
+
+        <!-- SECTOR -->
+        <div class="form-section">
+          <label for="sector">¿A qué te dedicas? <span class="opcional">Opcional, mejora las respuestas</span></label>
+          <input type="text" id="sector" name="sector" placeholder="Ej: disenador web, fontanero, enfermera..." maxlength="120" aria-label="Sector o profesion">
+        </div>
+
+        <!-- BLOQUE AUTÓNOMO -->
+        <div id="bloque-autonomo" class="bloque-condicional">
+          <label>¿Cuál es tu régimen fiscal?</label>
+          <div class="option-grid">
+            <button type="button" class="option-btn" data-value="estimacion_directa">
+              📊 Estimación directa
+            </button>
+            <button type="button" class="option-btn" data-value="modulos">
+              📈 Módulos
+            </button>
+            <button type="button" class="option-btn" data-value="no_se">
+              ❓ No lo sé
+            </button>
+          </div>
+          <input type="hidden" id="regimen_fiscal" name="regimen_fiscal">
+        </div>
+
+        <!-- BLOQUE ASALARIADO -->
+        <div id="bloque-asalariado" class="bloque-condicional">
+          <div class="form-group">
+            <label for="antiguedad">¿Cuántos años llevas en tu empresa? <span class="opcional">Opcional</span></label>
+            <input type="number" id="antiguedad" name="antiguedad" min="0" max="50" placeholder="Anos" aria-label="Antiguedad en anos">
+          </div>
+          <div class="form-group">
+            <label for="salario">¿Cuál es tu salario bruto anual? <span class="opcional">Opcional</span></label>
+            <input type="number" id="salario" name="salario" min="0" placeholder="EUR al ano" aria-label="Salario bruto anual">
+          </div>
+        </div>
+
+        <!-- BOTONES -->
+        <div class="button-group">
+          <button type="button" class="btn-secondary" id="btn-saltar">Saltar por ahora</button>
+          <button type="submit" class="btn-primary" id="btn-empezar">Comenzar →</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { requireSesion } from '/js/auth.js';
+    import { guardarPerfil, getPerfil } from '/js/perfil.js';
+    import '/js/gdpr.js';
+
+    // Verificar sesión
+    const email = requireSesion();
+
+    const form = document.getElementById('form-onboarding');
+    const inputSituacion = document.getElementById('situacion');
+    const bloqueAutonomo = document.getElementById('bloque-autonomo');
+    const bloqueAsalariado = document.getElementById('bloque-asalariado');
+    const btnSaltar = document.getElementById('btn-saltar');
+    const btnEmpezar = document.getElementById('btn-empezar');
+    const formError = document.getElementById('form-error');
+
+    // Estado
+    let situacionActual = null;
+    const datosFormulario = {
+      situacion: null,
+      ccaa: '',
+      sector: '',
+      regimen_fiscal: null,
+      antiguedad_anos: null,
+      salario_bruto_anual: null
+    };
+
+    // MANEJADORES DE BOTONES DE OPCIÓN
+    document.querySelectorAll('.option-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const parent = btn.parentElement;
+        const value = btn.dataset.value;
+
+        // Desactivar todos en el grupo
+        parent.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Determinar qué campo se actualiza
+        if (parent.id === undefined) {
+          // Es el grupo de situación
+          const group = btn.closest('.form-section');
+          if (group) {
+            const input = group.querySelector('input[type="hidden"]');
+            if (input) {
+              situacionActual = value;
+              inputSituacion.value = value;
+              datosFormulario.situacion = value;
+              actualizarBloques();
+            }
+          }
+        } else if (parent.id === 'bloque-autonomo') {
+          datosFormulario.regimen_fiscal = value;
+          document.getElementById('regimen_fiscal').value = value;
+        }
+      });
+    });
+
+    // ACTUALIZAR BLOQUES CONDICIONALES
+    function actualizarBloques() {
+      bloqueAutonomo.classList.remove('show');
+      bloqueAsalariado.classList.remove('show');
+
+      if (situacionActual === 'autonomo') {
+        bloqueAutonomo.classList.add('show');
+      } else if (situacionActual === 'asalariado') {
+        bloqueAsalariado.classList.add('show');
+      }
+    }
+
+    // ACTUALIZAR DATOS AL ESCRIBIR
+    document.getElementById('ccaa').addEventListener('change', (e) => {
+      datosFormulario.ccaa = e.target.value;
+    });
+
+    document.getElementById('sector').addEventListener('input', (e) => {
+      datosFormulario.sector = e.target.value;
+    });
+
+    document.getElementById('antiguedad').addEventListener('input', (e) => {
+      datosFormulario.antiguedad_anos = e.target.value ? parseInt(e.target.value) : null;
+    });
+
+    document.getElementById('salario').addEventListener('input', (e) => {
+      datosFormulario.salario_bruto_anual = e.target.value ? parseInt(e.target.value) : null;
+    });
+
+    // BOTÓN SALTAR
+    btnSaltar.addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.setItem('gestorai_onboarding_done', 'true');
+      window.location.href = '/app.html';
+    });
+
+    // ENVIO DEL FORMULARIO
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      formError.classList.remove('show');
+      formError.textContent = '';
+
+      // Validar que hay situación
+      if (!datosFormulario.situacion) {
+        formError.textContent = 'Por favor selecciona tu situación laboral.';
+        formError.classList.add('show');
+        return;
+      }
+
+      try {
+        // Guardar perfil
+        guardarPerfil(email, datosFormulario);
+
+        // Marcar onboarding como completo
+        localStorage.setItem('gestorai_onboarding_done', 'true');
+
+        console.log('✅ Onboarding completado:', datosFormulario);
+        window.location.href = '/app.html';
+      } catch (error) {
+        formError.textContent = 'Error al guardar el perfil: ' + error.message;
+        formError.classList.add('show');
+      }
+    });
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {
+        // No bloquea el flujo de onboarding
+      });
+    }
+  </script>
+</body>
+</html>

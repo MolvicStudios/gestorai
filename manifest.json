@@ -1,0 +1,38 @@
+{
+  "name": "GestorIA - Asesor Fiscal y Laboral Gratuito",
+  "short_name": "GestorIA",
+  "description": "Chatbot gratuito de orientación fiscal y laboral para autónomos, empleados y empresarios españoles",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#1d9e75",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Nueva consulta",
+      "short_name": "Consulta",
+      "description": "Inicia una nueva consulta fiscal o laboral",
+      "url": "/app.html"
+    }
+  ],
+  "share_target": {
+    "action": "/app.html",
+    "method": "POST",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

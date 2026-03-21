@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>GestorIA — Acceso a tu cuenta</title>
+  <meta name="description" content="Inicia sesión en GestorIA para acceder a tu asesor fiscal y laboral con IA.">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--bg) 100%);
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 420px;
+      padding: 2rem;
+    }
+
+    .login-card {
+      background-color: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-logo {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-header h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-header p {
+      color: var(--text2);
+      font-size: 0.95rem;
+    }
+
+    .login-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .login-tab {
+      flex: 1;
+      text-align: center;
+      padding: 1rem 0;
+      border: none;
+      background: none;
+      color: var(--text2);
+      cursor: pointer;
+      font-weight: 500;
+      transition: all var(--transition);
+      border-bottom: 3px solid transparent;
+    }
+
+    .login-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .login-form {
+      display: none;
+    }
+
+    .login-form.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-family: var(--font-main);
+      font-size: 1rem;
+      color: var(--text);
+      background-color: var(--bg);
+      transition: border-color var(--transition);
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(29, 158, 117, 0.1);
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      cursor: pointer;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      width: auto;
+      margin: 0.25rem 0 0 0;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .checkbox-label span {
+      color: var(--text2);
+    }
+
+    .checkbox-label a {
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .disclaimer-box {
+      background-color: var(--accent-light);
+      border-left: 4px solid var(--accent);
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      margin-bottom: 1rem;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-submit:disabled {
+      background-color: var(--text3);
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .form-error {
+      display: none;
+      background-color: rgba(226, 75, 74, 0.1);
+      border-left: 3px solid var(--danger);
+      color: var(--danger);
+      padding: 0.75rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .form-error.show {
+      display: block;
+    }
+
+    .form-success {
+      display: none;
+      background-color: var(--primary-light);
+      border-left: 3px solid var(--primary);
+      color: var(--text);
+      padding: 0.75rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .form-success.show {
+      display: block;
+    }
+
+    .login-footer {
+      text-align: center;
+      color: var(--text3);
+      font-size: 0.85rem;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .login-footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .login-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      margin-right: 0.5rem;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 1rem;
+      }
+
+      .login-card {
+        padding: 1.5rem;
+      }
+
+      .login-header h1 {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">🤖</div>
+        <h1>GestorIA</h1>
+        <p>Tu asesor fiscal y laboral con IA</p>
+      </div>
+
+      <!-- TABS -->
+      <div class="login-tabs">
+        <button class="login-tab active" id="tab-login">Acceso</button>
+        <button class="login-tab" id="tab-registro">Registro</button>
+      </div>
+
+      <!-- FORMULARIO LOGIN -->
+      <form class="login-form active" id="form-login">
+        <div class="form-error" id="error-login"></div>
+
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" placeholder="tu@email.com" required minlength="5" maxlength="255" autocomplete="email" aria-label="Correo electronico de acceso" aria-required="true">
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Contraseña</label>
+          <input type="password" id="login-password" placeholder="Minimo 8 caracteres" required minlength="8" maxlength="128" autocomplete="current-password" aria-label="Contrasena de acceso" aria-required="true">
+        </div>
+
+        <button type="submit" class="btn-submit" id="btn-login">
+          <span>Acceder</span>
+        </button>
+      </form>
+
+      <!-- FORMULARIO REGISTRO -->
+      <form class="login-form" id="form-registro">
+        <div class="form-error" id="error-registro"></div>
+        <div class="form-success" id="success-registro"></div>
+
+        <div class="form-group">
+          <label for="registro-email">Email</label>
+          <input type="email" id="registro-email" placeholder="tu@email.com" required minlength="5" maxlength="255" autocomplete="email" aria-label="Correo electronico de registro" aria-required="true">
+        </div>
+
+        <div class="form-group">
+          <label for="registro-password">Contraseña</label>
+          <input type="password" id="registro-password" placeholder="Minimo 8 caracteres" required minlength="8" maxlength="128" autocomplete="new-password" aria-label="Contrasena de registro" aria-required="true">
+        </div>
+
+        <div class="form-group">
+          <label for="registro-password-confirm">Confirmar contraseña</label>
+          <input type="password" id="registro-password-confirm" placeholder="Repite la contrasena" required minlength="8" maxlength="128" autocomplete="new-password" aria-label="Confirmar contrasena" aria-required="true">
+        </div>
+
+        <!-- DISCLAIMER OBLIGATORIO -->
+        <div class="disclaimer-box">
+          <strong>⚠️ Aviso importante:</strong><br>
+          Tus datos se guardan <strong>únicamente en este navegador</strong>.
+          Si cambias de dispositivo o borras los datos del navegador, perderás
+          tu historial de consultas.
+        </div>
+
+        <label class="checkbox-label">
+          <input type="checkbox" id="acepto-disclaimer" required>
+          <span>
+            He leído y acepto que GestorIA ofrece orientación fiscal y laboral general,
+            no asesoría profesional certificada. MolvicStudios no asume responsabilidad
+            por las decisiones tomadas a partir de las respuestas del chatbot.
+            <a href="/terminos.html" target="_blank">Leer términos completos</a>
+          </span>
+        </label>
+
+        <button type="submit" class="btn-submit" id="btn-registro">
+          <span>Crear cuenta</span>
+        </button>
+      </form>
+
+      <div class="login-footer">
+        Ecosistema
+        <a href="https://molvicstudios.pro" target="_blank" rel="noopener noreferrer">
+          MolvicStudios
+        </a>
+        · Mazarrón, Murcia
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { login, registrar, tieneSesion } from '/js/auth.js';
+    import '/js/gdpr.js';
+
+    // Si ya hay sesión, redirigir a app
+    if (tieneSesion()) {
+      window.location.href = '/app.html';
+    }
+
+    // TABS
+    const tabLogin = document.getElementById('tab-login');
+    const tabRegistro = document.getElementById('tab-registro');
+    const formLogin = document.getElementById('form-login');
+    const formRegistro = document.getElementById('form-registro');
+
+    tabLogin.addEventListener('click', () => {
+      tabLogin.classList.add('active');
+      tabRegistro.classList.remove('active');
+      formLogin.classList.add('active');
+      formRegistro.classList.remove('active');
+    });
+
+    tabRegistro.addEventListener('click', () => {
+      tabRegistro.classList.add('active');
+      tabLogin.classList.remove('active');
+      formRegistro.classList.add('active');
+      formLogin.classList.remove('active');
+    });
+
+    // FORMULARIO LOGIN
+    formLogin.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const errorEl = document.getElementById('error-login');
+      const btnSubmit = formLogin.querySelector('.btn-submit');
+      const btnText = btnSubmit.querySelector('span');
+
+      errorEl.classList.remove('show');
+      errorEl.textContent = '';
+      btnSubmit.disabled = true;
+      btnText.innerHTML = '<span class="loading"></span>Accediendo...';
+
+      try {
+        await login(email, password);
+        window.location.href = '/app.html';
+      } catch (error) {
+        errorEl.textContent = error.message;
+        errorEl.classList.add('show');
+        btnSubmit.disabled = false;
+        btnText.textContent = 'Acceder';
+      }
+    });
+
+    // FORMULARIO REGISTRO
+    formRegistro.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('registro-email').value;
+      const password = document.getElementById('registro-password').value;
+      const passwordConfirm = document.getElementById('registro-password-confirm').value;
+      const disclaimer = document.getElementById('acepto-disclaimer').checked;
+      const errorEl = document.getElementById('error-registro');
+      const successEl = document.getElementById('success-registro');
+      const btnSubmit = formRegistro.querySelector('.btn-submit');
+      const btnText = btnSubmit.querySelector('span');
+
+      errorEl.classList.remove('show');
+      successEl.classList.remove('show');
+      errorEl.textContent = '';
+
+      // Validaciones
+      if (!disclaimer) {
+        errorEl.textContent = 'Debes aceptar los términos para continuar.';
+        errorEl.classList.add('show');
+        return;
+      }
+
+      if (password !== passwordConfirm) {
+        errorEl.textContent = 'Las contraseñas no coinciden.';
+        errorEl.classList.add('show');
+        return;
+      }
+
+      btnSubmit.disabled = true;
+      btnText.innerHTML = '<span class="loading"></span>Creando cuenta...';
+
+      try {
+        await registrar(email, password);
+        successEl.textContent = '✅ ¡Cuenta creada! Redirigiendo...';
+        successEl.classList.add('show');
+        setTimeout(() => {
+          window.location.href = '/onboarding.html';
+        }, 1500);
+      } catch (error) {
+        errorEl.textContent = error.message;
+        errorEl.classList.add('show');
+        btnSubmit.disabled = false;
+        btnText.textContent = 'Crear cuenta';
+      }
+    });
+
+    // Validación en tiempo real
+    document.getElementById('registro-password-confirm').addEventListener('input', function() {
+      const pwd = document.getElementById('registro-password').value;
+      const confirm = this.value;
+      if (pwd && confirm && pwd !== confirm) {
+        this.style.borderColor = 'var(--danger)';
+      } else {
+        this.style.borderColor = '';
+      }
+    });
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {
+        // No bloquea la experiencia de login
+      });
+    }
+  </script>
+</body>
+</html>
