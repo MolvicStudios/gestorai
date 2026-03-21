@@ -3,7 +3,7 @@
  * Gestiona caché offline, assets estáticos, y estrategias de red
  */
 
-const CACHE_NAME = 'gestorai-v7';
+const CACHE_NAME = 'gestorai-v8';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -30,8 +30,6 @@ const STATIC_ASSETS = [
   '/js/herramientas/calendario.js',
   '/manifest.json',
 ];
-
-const OFFLINE_URL = '/index.html';
 
 /**
  * Instala el Service Worker y precarga assets estáticos
@@ -69,75 +67,83 @@ self.addEventListener('activate', (event) => {
 
 /**
  * Intercepta requests y aplica estrategia Cache-First para assets,
- * Network-First para datos
+ * Network-First para HTML. Las navegaciones (HTML) nunca caen en
+ * fallback a index.html para evitar que páginas incorrectas aparezcan.
  */
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Excluir APIs de terceros (Groq, Mistral) y Cloudflare Functions
-  if (
-    url.hostname.includes('api.groq.com') ||
-    url.hostname.includes('api.mistral.ai') ||
-    url.pathname.startsWith('/api/') && !url.pathname.includes('/api/config')
-  ) {
-    // Network-only para APIs de IA
-    event.respondWith(
-      fetch(request).catch(() => {
-        return new Response('Sin conexión a IA', {
-          status: 503,
-          statusText: 'Service Unavailable',
-        });
-      })
-    );
+  // Dejar pasar requests a otros dominios (APIs externas, fuentes, etc.)
+  if (url.hostname !== self.location.hostname) {
     return;
   }
 
-  // Cache-First para assets estáticos (JS, CSS)
+  // No interceptar rutas de API (Cloudflare Functions)
+  if (url.pathname.startsWith('/api/')) {
+    return;
+  }
+
+  // Cache-First para assets estáticos (JS, CSS, imágenes)
   if (
     url.pathname.endsWith('.js') ||
     url.pathname.endsWith('.css') ||
     url.pathname.endsWith('.png') ||
     url.pathname.endsWith('.jpg') ||
-    url.pathname.endsWith('.svg')
+    url.pathname.endsWith('.svg') ||
+    url.pathname.endsWith('.ico') ||
+    url.pathname.endsWith('.webp')
   ) {
     event.respondWith(
-      caches.match(request).then((response) => {
-        return response || fetch(request).then((response) => {
+      caches.match(request).then((cached) => {
+        if (cached) return cached;
+        return fetch(request).then((response) => {
           if (response && response.status === 200) {
-            const responseClone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, responseClone);
-            });
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
           }
           return response;
-        }).catch(() => {
-          return new Response('Asset no disponible offline', { status: 503 });
         });
       })
     );
     return;
   }
 
-  // Network-First para HTML + /api/config (IA + configuración)
-  event.respondWith(
-    fetch(request)
-      .then((response) => {
-        if (response && response.status === 200) {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, responseClone);
+  // Network-First para HTML. Si la red falla, usa caché del HTML específico.
+  // NUNCA devuelve index.html como fallback de otra página.
+  if (
+    request.mode === 'navigate' ||
+    url.pathname.endsWith('.html') ||
+    url.pathname === '/'
+  ) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() => {
+          // Fallback al HTML cacheado de ESA misma URL (nunca de otra)
+          return caches.match(request).then((cached) => {
+            if (cached) return cached;
+            return new Response(
+              '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Sin conexión</title></head>' +
+              '<body style="font-family:sans-serif;text-align:center;padding:2rem">' +
+              '<h1>Sin conexión</h1><p>Comprueba tu conexión a internet e inténtalo de nuevo.</p>' +
+              '<a href="/">Volver al inicio</a></body></html>',
+              { headers: { 'Content-Type': 'text/html' } }
+            );
           });
-        }
-        return response;
-      })
-      .catch(() => {
-        // Si cae la red, intenta fallback en caché
-        return caches.match(request).then((response) => {
-          return response || caches.match(OFFLINE_URL);
-        });
-      })
-  );
+        })
+    );
+    return;
+  }
+
+  // Para cualquier otra request, pasar directamente a la red
+  event.respondWith(fetch(request));
 });
 
 /**
