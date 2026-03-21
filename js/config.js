@@ -26,16 +26,16 @@ async function inicializarIA() {
       }
 
       const config = await res.json();
-      GROQ_KEY = config.groq_key;
-      MISTRAL_KEY = config.mistral_key;
-      console.log('✅ Claves IA cargadas correctamente desde:', ruta);
+      GROQ_KEY = config?.providers?.groq ? 'configured' : null;
+      MISTRAL_KEY = config?.providers?.mistral ? 'configured' : null;
+      console.log('✅ Estado de IA cargado desde:', ruta, config.providers || {});
       return;
     } catch (e) {
       console.warn(`⚠️ Fallo al cargar configuración desde ${ruta}:`, e);
     }
   }
 
-  console.error('❌ No se pudieron cargar las claves de IA desde ninguna ruta disponible.');
+  console.error('❌ No se pudo verificar el estado de los proveedores de IA.');
 }
 
 // ========================================================================

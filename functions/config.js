@@ -1,10 +1,6 @@
 /**
- * Cloudflare Pages Function: /api/config
- * GET /api/config
- * 
- * Devuelve las claves públicas de IA (Groq + Mistral)
- * Las claves se definen en Cloudflare Pages → Settings → Environment variables
- * Nunca hardcodear las claves en el código fuente.
+ * Cloudflare Pages Function: /config
+ * Devuelve solo estado de configuracion, nunca secretos.
  */
 
 export const onRequest = async (context) => {
@@ -12,8 +8,10 @@ export const onRequest = async (context) => {
 
   return new Response(
     JSON.stringify({
-      groq_key:    env.GROQ_API_KEY || null,
-      mistral_key: env.MISTRAL_API_KEY || null
+      providers: {
+        groq: Boolean(env.GROQ_API_KEY),
+        mistral: Boolean(env.MISTRAL_API_KEY)
+      }
     }),
     {
       status: 200,
