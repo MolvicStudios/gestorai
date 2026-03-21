@@ -55,25 +55,18 @@ const GDPR = {
     banner.id = this.BANNER_ID;
     banner.style.cssText = `
       position: fixed;
-      bottom: 1rem;
-      left: 1rem;
-      right: 1rem;
-      max-width: 960px;
-      margin: 0 auto;
-      background: ${bg};
-      color: ${text};
-      border: 1px solid ${border};
-      border-top: 4px solid ${primary};
-      border-radius: 16px;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
       padding: 1rem;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+      background: rgba(0, 0, 0, 0.38);
       z-index: 2147483647;
-      font-size: 0.95rem;
-      animation: slideUp 0.3s ease-out;
+      opacity: 1;
     `;
 
     banner.innerHTML = `
-      <div style="display: grid; gap: 0.9rem;">
+      <div style="display: grid; gap: 0.9rem; width: min(960px, 100%); background: ${bg}; color: ${text}; border: 1px solid ${border}; border-top: 4px solid ${primary}; border-radius: 16px; padding: 1rem; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28); opacity: 1;">
         <div style="display: grid; gap: 0.45rem;">
           <strong style="font-size: 1rem; color: ${text};">Cookies y privacidad</strong>
           <p style="margin: 0; line-height: 1.55; color: ${text2};">
@@ -129,7 +122,7 @@ const GDPR = {
     if (banner) {
       banner.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
       banner.style.opacity = '0';
-      banner.style.transform = 'translateY(12px)';
+      banner.style.transform = 'translateY(0)';
       setTimeout(() => banner.remove(), 220);
     }
   },

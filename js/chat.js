@@ -285,7 +285,9 @@ export function renderMensaje(mensaje, container) {
   div.className = `mensaje mensaje-${mensaje.role}`;
   
   if (mensaje.role === 'user') {
-    div.innerHTML = `<p>${mensaje.content}</p>`;
+    const p = document.createElement('p');
+    p.textContent = mensaje.content;
+    div.appendChild(p);
   } else {
     // Parsear markdown para asistente
     const html = parsearMarkdown(mensaje.content);
