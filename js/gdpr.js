@@ -46,31 +46,40 @@ const GDPR = {
     banner.id = this.BANNER_ID;
     banner.style.cssText = `
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--color-surface);
-      border-top: 2px solid var(--color-primary);
+      bottom: 1rem;
+      left: 1rem;
+      right: 1rem;
+      max-width: 960px;
+      margin: 0 auto;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--primary);
+      border-radius: 16px;
       padding: 1rem;
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
       z-index: 9999;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       animation: slideUp 0.3s ease-out;
     `;
 
     banner.innerHTML = `
-      <div class="container" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
-        <div>
-          <p style="margin: 0; line-height: 1.5;">
-            <strong>🍪 Política de Cookies:</strong> Usamos localStorage (no cookies de rastreo) para guardar tu sesión, perfil e historial en tu navegador.
-            Al aceptar, consenties el almacenamiento según nuestra <a href="/cookies.html" style="color: var(--color-primary); text-decoration: underline;">política de cookies</a> y <a href="/privacidad.html" style="color: var(--color-primary); text-decoration: underline;">privacidad</a>.
+      <div style="display: grid; gap: 0.9rem;">
+        <div style="display: grid; gap: 0.45rem;">
+          <strong style="font-size: 1rem; color: var(--text);">Cookies y privacidad</strong>
+          <p style="margin: 0; line-height: 1.55; color: var(--text2);">
+            GestorIA usa localStorage para guardar sesion, perfil, historial y preferencia visual en este navegador.
+            No usamos cookies de rastreo. Puedes revisar la
+            <a href="/cookies.html" style="color: var(--primary); text-decoration: underline;">politica de cookies</a>
+            y la
+            <a href="/privacidad.html" style="color: var(--primary); text-decoration: underline;">politica de privacidad</a>.
           </p>
         </div>
-        <div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
-          <button id="gdpr-reject" class="btn" style="background: var(--color-danger); color: white; padding: 0.5rem 1rem; cursor: pointer;">
+        <div style="display: flex; gap: 0.65rem; flex-wrap: wrap; justify-content: flex-end;">
+          <button id="gdpr-reject" class="btn btn-secondary" type="button" style="min-width: 130px; border-color: var(--danger); color: var(--danger);">
             Rechazar
           </button>
-          <button id="gdpr-accept" class="btn" style="background: var(--color-primary); color: white; padding: 0.5rem 1rem; cursor: pointer;">
+          <button id="gdpr-accept" class="btn" type="button" style="min-width: 130px; background: var(--primary); color: white; border: 1px solid var(--primary);">
             Aceptar
           </button>
         </div>
@@ -109,8 +118,10 @@ const GDPR = {
   hide() {
     const banner = document.getElementById(this.BANNER_ID);
     if (banner) {
-      banner.style.animation = 'slideDown 0.3s ease-out forwards';
-      setTimeout(() => banner.remove(), 300);
+      banner.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+      banner.style.opacity = '0';
+      banner.style.transform = 'translateY(12px)';
+      setTimeout(() => banner.remove(), 220);
     }
   },
 

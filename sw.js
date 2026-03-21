@@ -3,7 +3,7 @@
  * Gestiona caché offline, assets estáticos, y estrategias de red
  */
 
-const CACHE_NAME = 'gestorai-v2';
+const CACHE_NAME = 'gestorai-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

@@ -356,19 +356,24 @@
     const formLogin = document.getElementById('form-login');
     const formRegistro = document.getElementById('form-registro');
 
+    function activarTab(tab) {
+      const mostrarRegistro = tab === 'registro';
+      tabLogin.classList.toggle('active', !mostrarRegistro);
+      tabRegistro.classList.toggle('active', mostrarRegistro);
+      formLogin.classList.toggle('active', !mostrarRegistro);
+      formRegistro.classList.toggle('active', mostrarRegistro);
+    }
+
     tabLogin.addEventListener('click', () => {
-      tabLogin.classList.add('active');
-      tabRegistro.classList.remove('active');
-      formLogin.classList.add('active');
-      formRegistro.classList.remove('active');
+      activarTab('login');
     });
 
     tabRegistro.addEventListener('click', () => {
-      tabRegistro.classList.add('active');
-      tabLogin.classList.remove('active');
-      formRegistro.classList.add('active');
-      formLogin.classList.remove('active');
+      activarTab('registro');
     });
+
+    const tabInicial = new URLSearchParams(window.location.search).get('tab');
+    activarTab(tabInicial === 'registro' ? 'registro' : 'login');
 
     // FORMULARIO LOGIN
     formLogin.addEventListener('submit', async (e) => {
