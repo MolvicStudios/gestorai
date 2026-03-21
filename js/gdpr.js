@@ -42,6 +42,15 @@ const GDPR = {
       return; // Ya existe
     }
 
+    const estilos = getComputedStyle(document.documentElement);
+    const bg = estilos.getPropertyValue('--bg').trim() || '#ffffff';
+    const bg2 = estilos.getPropertyValue('--bg2').trim() || '#f8f9fa';
+    const text = estilos.getPropertyValue('--text').trim() || '#1a1a1a';
+    const text2 = estilos.getPropertyValue('--text2').trim() || '#6b6b6b';
+    const border = estilos.getPropertyValue('--border').trim() || '#e5e7eb';
+    const primary = estilos.getPropertyValue('--primary').trim() || '#1D9E75';
+    const danger = estilos.getPropertyValue('--danger').trim() || '#E24B4A';
+
     const banner = document.createElement('div');
     banner.id = this.BANNER_ID;
     banner.style.cssText = `
@@ -51,14 +60,14 @@ const GDPR = {
       right: 1rem;
       max-width: 960px;
       margin: 0 auto;
-      background: var(--bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-top: 4px solid var(--primary);
+      background: ${bg};
+      color: ${text};
+      border: 1px solid ${border};
+      border-top: 4px solid ${primary};
       border-radius: 16px;
       padding: 1rem;
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
-      z-index: 9999;
+      z-index: 2147483647;
       font-size: 0.95rem;
       animation: slideUp 0.3s ease-out;
     `;
@@ -66,20 +75,20 @@ const GDPR = {
     banner.innerHTML = `
       <div style="display: grid; gap: 0.9rem;">
         <div style="display: grid; gap: 0.45rem;">
-          <strong style="font-size: 1rem; color: var(--text);">Cookies y privacidad</strong>
-          <p style="margin: 0; line-height: 1.55; color: var(--text2);">
+          <strong style="font-size: 1rem; color: ${text};">Cookies y privacidad</strong>
+          <p style="margin: 0; line-height: 1.55; color: ${text2};">
             GestorIA usa localStorage para guardar sesion, perfil, historial y preferencia visual en este navegador.
             No usamos cookies de rastreo. Puedes revisar la
-            <a href="/cookies.html" style="color: var(--primary); text-decoration: underline;">politica de cookies</a>
+            <a href="/cookies.html" style="color: ${primary}; text-decoration: underline;">politica de cookies</a>
             y la
-            <a href="/privacidad.html" style="color: var(--primary); text-decoration: underline;">politica de privacidad</a>.
+            <a href="/privacidad.html" style="color: ${primary}; text-decoration: underline;">politica de privacidad</a>.
           </p>
         </div>
         <div style="display: flex; gap: 0.65rem; flex-wrap: wrap; justify-content: flex-end;">
-          <button id="gdpr-reject" class="btn btn-secondary" type="button" style="min-width: 130px; border-color: var(--danger); color: var(--danger);">
+          <button id="gdpr-reject" class="btn btn-secondary" type="button" style="min-width: 130px; background: ${bg2}; border: 1px solid ${danger}; color: ${danger};">
             Rechazar
           </button>
-          <button id="gdpr-accept" class="btn" type="button" style="min-width: 130px; background: var(--primary); color: white; border: 1px solid var(--primary);">
+          <button id="gdpr-accept" class="btn" type="button" style="min-width: 130px; background: ${primary}; color: white; border: 1px solid ${primary};">
             Aceptar
           </button>
         </div>

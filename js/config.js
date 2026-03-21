@@ -10,15 +10,32 @@ let MISTRAL_KEY = null;
 // ========================================================================
 
 async function inicializarIA() {
-  try {
-    const res = await fetch('/api/config');
-    const config = await res.json();
-    GROQ_KEY = config.groq_key;
-    MISTRAL_KEY = config.mistral_key;
-    console.log('✅ Claves IA cargadas correctamente');
-  } catch (e) {
-    console.error('❌ No se pudieron cargar las claves de IA:', e);
+  const rutas = ['/api/config', '/config'];
+
+  for (const ruta of rutas) {
+    try {
+      const res = await fetch(ruta, {
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      const contentType = res.headers.get('content-type') || '';
+      if (!res.ok || !contentType.includes('application/json')) {
+        throw new Error(`Respuesta no valida en ${ruta}`);
+      }
+
+      const config = await res.json();
+      GROQ_KEY = config.groq_key;
+      MISTRAL_KEY = config.mistral_key;
+      console.log('✅ Claves IA cargadas correctamente desde:', ruta);
+      return;
+    } catch (e) {
+      console.warn(`⚠️ Fallo al cargar configuración desde ${ruta}:`, e);
+    }
   }
+
+  console.error('❌ No se pudieron cargar las claves de IA desde ninguna ruta disponible.');
 }
 
 // ========================================================================
