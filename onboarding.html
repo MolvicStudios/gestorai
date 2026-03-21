@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <script>(function(){var t=localStorage.getItem('gestorai_tema');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GestorIA — Configurar tu perfil</title>
@@ -393,21 +394,16 @@
         btn.classList.add('active');
 
         // Determinar qué campo se actualiza
-        if (parent.id === undefined) {
-          // Es el grupo de situación
-          const group = btn.closest('.form-section');
-          if (group) {
-            const input = group.querySelector('input[type="hidden"]');
-            if (input) {
-              situacionActual = value;
-              inputSituacion.value = value;
-              datosFormulario.situacion = value;
-              actualizarBloques();
-            }
-          }
-        } else if (parent.id === 'bloque-autonomo') {
+        if (btn.closest('#bloque-autonomo')) {
+          // Botón de régimen fiscal (dentro del bloque autonomo)
           datosFormulario.regimen_fiscal = value;
           document.getElementById('regimen_fiscal').value = value;
+        } else {
+          // Botón de situación laboral
+          situacionActual = value;
+          inputSituacion.value = value;
+          datosFormulario.situacion = value;
+          actualizarBloques();
         }
       });
     });

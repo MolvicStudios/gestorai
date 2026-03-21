@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <script>(function(){var t=localStorage.getItem('gestorai_tema');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GestorIA — Tu asesor fiscal y laboral</title>
@@ -325,6 +326,45 @@
       opacity: 0.6;
     }
 
+    /* Tool / Perfil panel */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin: 1rem 0 0 1.5rem;
+      transition: background-color var(--transition);
+      flex-shrink: 0;
+    }
+
+    .back-btn:hover {
+      background-color: var(--bg3);
+    }
+
+    .historial-item {
+      font-size: 0.82rem !important;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .alert-danger {
+      background-color: rgba(226, 75, 74, 0.1);
+      border-left: 3px solid var(--danger);
+      color: var(--danger);
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      align-self: flex-start;
+      max-width: 85%;
+    }
+
     /* RESPONSIVE */
     @media (max-width: 768px) {
       aside {
@@ -434,6 +474,9 @@
 
   <!-- MAIN CONTENT -->
   <main id="main-content">
+    <!-- PANEL HERRAMIENTAS / PERFIL -->
+    <div id="tool-panel" style="display:none;flex-direction:column;flex:1;overflow-y:auto;"></div>
+
     <div class="chat-area" id="chat-area">
       <div class="chat-messages" id="chat-messages"></div>
       <div class="chat-footer">
@@ -461,7 +504,6 @@
     } from '/js/historial.js';
     import {
       enviarMensaje,
-      parsearMarkdown,
       renderMensaje,
       mostrarTypingIndicator,
       quitarTypingIndicator,
@@ -469,6 +511,12 @@
       SUGERENCIAS
     } from '/js/chat.js';
     import { cambiarTema, obtenerTemaActual, TEMAS } from '/js/config.js';
+    import { getHTMLCuota, inicializarCuota } from '/js/herramientas/cuota.js';
+    import { getHTML130, inicializar130 } from '/js/herramientas/irpf130.js';
+    import { getHTMLFiniquito, inicializarFiniquito } from '/js/herramientas/finiquito.js';
+    import { getHTMLIndemnizacion, inicializarIndemnizacion } from '/js/herramientas/indemnizacion.js';
+    import { getHTML303, inicializar303 } from '/js/herramientas/modelo303.js';
+    import { getHTMLCalendario, inicializarCalendario, generarCalendario } from '/js/herramientas/calendario.js';
     import '/js/gdpr.js';
 
     // ========================================================================
@@ -484,24 +532,180 @@
     let conversacionActual = crearConversacion();
     let typingIndicator = null;
 
-    // Actualizar nombre de usuario en header
     document.getElementById('btn-usuario').textContent = `👤 ${usuario.email.split('@')[0]}`;
+
+    // ========================================================================
+    // REFERENCIAS AL DOM
+    // ========================================================================
+
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput    = document.getElementById('chat-input');
+    const btnEnviar    = document.getElementById('btn-enviar');
+    const chatArea     = document.getElementById('chat-area');
+    const toolPanel    = document.getElementById('tool-panel');
+
+    // ========================================================================
+    // HERRAMIENTAS
+    // ========================================================================
+
+    const HERRAMIENTAS_MAP = {
+      cuota:         { getHTML: getHTMLCuota,          init: inicializarCuota },
+      irpf130:       { getHTML: getHTML130,             init: inicializar130 },
+      finiquito:     { getHTML: getHTMLFiniquito,       init: inicializarFiniquito },
+      indemnizacion: { getHTML: getHTMLIndemnizacion,   init: inicializarIndemnizacion },
+      modelo303:     { getHTML: getHTML303,             init: inicializar303 },
+      calendario: {
+        getHTML: () => {
+          const perfil = getPerfil(email);
+          const eventos = generarCalendario(perfil);
+          return getHTMLCalendario(eventos);
+        },
+        init: inicializarCalendario
+      },
+    };
+
+    function mostrarHerramienta(nombre) {
+      const h = HERRAMIENTAS_MAP[nombre];
+      if (!h) return;
+      chatArea.style.display = 'none';
+      toolPanel.style.display = 'flex';
+      toolPanel.innerHTML = `
+        <button class="back-btn" id="btn-volver-chat">← Volver al chat</button>
+        <div>${h.getHTML()}</div>
+      `;
+      document.getElementById('btn-volver-chat').addEventListener('click', ocultarHerramienta);
+      h.init();
+    }
+
+    function ocultarHerramienta() {
+      chatArea.style.display = 'flex';
+      toolPanel.style.display = 'none';
+      toolPanel.innerHTML = '';
+    }
+
+    document.querySelectorAll('.sidebar-item[data-tool]').forEach(btn => {
+      btn.addEventListener('click', () => mostrarHerramienta(btn.dataset.tool));
+    });
+
+    // ========================================================================
+    // HISTORIAL SIDEBAR
+    // ========================================================================
+
+    function cargarHistorialSidebar() {
+      const historial = getHistorial(email);
+      const section   = document.getElementById('historial-section');
+      const lista     = document.getElementById('lista-historial');
+
+      if (historial.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+
+      section.style.display = '';
+      lista.innerHTML = '';
+
+      const recientes = [...historial].reverse().slice(0, 20);
+      recientes.forEach(conv => {
+        const btn = document.createElement('button');
+        btn.className = 'sidebar-btn historial-item';
+        btn.textContent = conv.titulo || 'Consulta sin título';
+        btn.title = new Date(conv.fecha).toLocaleDateString('es-ES') + ' — ' + (conv.titulo || 'Sin título');
+        btn.addEventListener('click', () => cargarConversacionDesdeHistorial(conv.id));
+        lista.appendChild(btn);
+      });
+    }
+
+    function cargarConversacionDesdeHistorial(convId) {
+      const conv = getConversacion(email, convId);
+      if (!conv) return;
+      conversacionActual = conv;
+      ocultarHerramienta();
+      chatMessages.innerHTML = '';
+      if (conv.mensajes.length === 0) {
+        mostrarSugerencias();
+      } else {
+        conv.mensajes.forEach(m => renderMensaje(m, chatMessages));
+      }
+    }
+
+    // ========================================================================
+    // PERFIL
+    // ========================================================================
+
+    function mostrarPerfil() {
+      const perfil  = getPerfil(email);
+      const CCAAS   = ['Andalucía','Aragón','Asturias','Balears (Illes)','Canarias','Cantabria',
+        'Castilla y León','Castilla-La Mancha','Cataluña','Ceuta','Comunidad de Madrid',
+        'Comunidad Foral de Navarra','Comunidad Valenciana','Extremadura','Galicia',
+        'La Rioja','Melilla','País Vasco','Región de Murcia'];
+      const SIT = { autonomo:'Autónomo', asalariado:'Asalariado', desempleado:'Desempleo',
+        empresario:'Empresario', otro:'Otra situación' };
+
+      chatArea.style.display  = 'none';
+      toolPanel.style.display = 'flex';
+      toolPanel.innerHTML = `
+        <button class="back-btn" id="btn-volver-perfil">← Volver al chat</button>
+        <div style="max-width:540px;margin:0 auto;padding:1.5rem;flex:1;">
+          <h2 style="margin-bottom:.25rem;">⚙️ Mi perfil</h2>
+          <p style="font-size:.9rem;color:var(--text2);margin-bottom:1.5rem;">
+            Estos datos personalizan las respuestas. Se guardan solo en este navegador.
+          </p>
+          <form id="form-perfil" style="display:grid;gap:1.2rem;">
+            <div>
+              <label style="display:block;font-weight:500;margin-bottom:.4rem;">Situación laboral</label>
+              <select id="perfil-situacion" style="width:100%;padding:.75rem;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg);color:var(--text);">
+                <option value="">— Sin especificar —</option>
+                ${Object.entries(SIT).map(([v,l])=>`<option value="${v}"${perfil.situacion===v?' selected':''}>${l}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-weight:500;margin-bottom:.4rem;">Comunidad autónoma</label>
+              <select id="perfil-ccaa" style="width:100%;padding:.75rem;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg);color:var(--text);">
+                <option value="">— No especificado —</option>
+                ${CCAAS.map(c=>`<option value="${c}"${perfil.ccaa===c?' selected':''}>${c}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-weight:500;margin-bottom:.4rem;">Sector / Profesión</label>
+              <input type="text" id="perfil-sector" value="${perfil.sector||''}" maxlength="120"
+                     placeholder="Ej: fontanero, diseñadora gráfica..."
+                     style="width:100%;padding:.75rem;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg);color:var(--text);">
+            </div>
+            <div>
+              <button type="submit" style="padding:.75rem 1.5rem;background-color:var(--primary);color:white;border:none;border-radius:var(--radius-md);font-weight:600;cursor:pointer;">
+                Guardar cambios
+              </button>
+            </div>
+            <div id="perfil-ok" style="display:none;color:var(--success);font-weight:500;">✅ Perfil guardado correctamente.</div>
+          </form>
+        </div>
+      `;
+      document.getElementById('btn-volver-perfil').addEventListener('click', ocultarHerramienta);
+      document.getElementById('form-perfil').addEventListener('submit', e => {
+        e.preventDefault();
+        guardarPerfil(email, {
+          situacion: document.getElementById('perfil-situacion').value || null,
+          ccaa:      document.getElementById('perfil-ccaa').value      || null,
+          sector:    document.getElementById('perfil-sector').value.trim() || null,
+        });
+        const ok = document.getElementById('perfil-ok');
+        ok.style.display = 'block';
+        setTimeout(() => { ok.style.display = 'none'; }, 3000);
+      });
+    }
+
+    document.getElementById('btn-perfil').addEventListener('click', mostrarPerfil);
+    document.getElementById('btn-usuario').addEventListener('click', mostrarPerfil);
 
     // ========================================================================
     // CHAT PRINCIPAL
     // ========================================================================
 
-    const chatMessages = document.getElementById('chat-messages');
-    const chatInput = document.getElementById('chat-input');
-    const btnEnviar = document.getElementById('btn-enviar');
-
-    // Auto-expandir textarea
     chatInput.addEventListener('input', function() {
       this.style.height = 'auto';
       this.style.height = Math.min(this.scrollHeight, 120) + 'px';
     });
 
-    // Enviar con Enter (sin Shift)
     chatInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
@@ -509,7 +713,6 @@
       }
     });
 
-    // Mostrar sugerencias iniciales
     function mostrarSugerencias() {
       chatMessages.innerHTML = '';
       const div = document.createElement('div');
@@ -529,33 +732,27 @@
     }
 
     mostrarSugerencias();
+    cargarHistorialSidebar();
 
-    // Enviar mensaje
     btnEnviar.addEventListener('click', async () => {
       const texto = chatInput.value.trim();
-
       if (!texto) return;
 
-      // Mostrar mensaje del usuario
-      renderMensaje({ role: 'user', content: texto }, chatMessages);
+      // Quitar sugerencias si están visibles
+      chatMessages.querySelector('.inicial-sugerencias')?.remove();
 
-      // Mostrar typing indicator
+      renderMensaje({ role: 'user', content: texto }, chatMessages);
       typingIndicator = mostrarTypingIndicator(chatMessages);
 
-      // Deshabilitar input
       chatInput.value = '';
       chatInput.style.height = 'auto';
       btnEnviar.disabled = true;
 
       try {
         const respuesta = await enviarMensaje(texto, conversacionActual);
-
-        // Quitar typing indicator
         quitarTypingIndicator(typingIndicator);
-
-        // Mostrar respuesta
         renderMensaje({ role: 'assistant', content: respuesta }, chatMessages);
-
+        cargarHistorialSidebar();
       } catch (error) {
         quitarTypingIndicator(typingIndicator);
         renderError(error.message, chatMessages);
@@ -566,7 +763,7 @@
     });
 
     // ========================================================================
-    // BOTONES DE TEMA
+    // TEMA
     // ========================================================================
 
     const btnTema = document.getElementById('btn-tema');
@@ -586,7 +783,7 @@
     actualizarIconoTema();
 
     // ========================================================================
-    // BOTÓN LOGOUT
+    // LOGOUT
     // ========================================================================
 
     document.getElementById('btn-logout').addEventListener('click', () => {
@@ -601,7 +798,7 @@
 
     document.getElementById('btn-nuevo-chat').addEventListener('click', () => {
       conversacionActual = crearConversacion();
-      guardarConversacion(email, conversacionActual);
+      ocultarHerramienta();
       mostrarSugerencias();
       chatInput.focus();
     });
