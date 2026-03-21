@@ -110,6 +110,21 @@ export async function login(email, password) {
   return usuario;
 }
 
+function obtenerSesionValida() {
+  const email = localStorage.getItem('gestorai_sesion_activa');
+  if (!email) return null;
+
+  const usuarios = JSON.parse(localStorage.getItem('gestorai_usuarios') || '[]');
+  const usuario = usuarios.find(u => u.email === email);
+
+  if (!usuario) {
+    localStorage.removeItem('gestorai_sesion_activa');
+    return null;
+  }
+
+  return email;
+}
+
 // ========================================================================
 // 4. LOGOUT
 // ========================================================================
@@ -136,10 +151,10 @@ export function logout() {
  * @returns {string|null} Email del usuario actual o null si no hay sesión
  */
 export function requireSesion() {
-  const sesion = localStorage.getItem('gestorai_sesion_activa');
+  const sesion = obtenerSesionValida();
   if (!sesion) {
     console.warn('⚠️ No hay sesión activa. Redirigiendo a login...');
-    window.location.href = '/login.html';
+    window.location.replace('/login.html');
     return null;
   }
   return sesion;
@@ -154,7 +169,7 @@ export function requireSesion() {
  * @returns {Object|null} Usuario actual o null si no hay sesión
  */
 export function getUsuarioActual() {
-  const email = localStorage.getItem('gestorai_sesion_activa');
+  const email = obtenerSesionValida();
   if (!email) return null;
 
   const usuarios = JSON.parse(localStorage.getItem('gestorai_usuarios') || '[]');
@@ -170,7 +185,7 @@ export function getUsuarioActual() {
  * @returns {boolean}
  */
 export function tieneSesion() {
-  return !!localStorage.getItem('gestorai_sesion_activa');
+  return !!obtenerSesionValida();
 }
 
 // ========================================================================

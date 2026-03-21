@@ -1,40 +1,20 @@
 # Cloudflare Pages Redirects (_redirects file)
 # Format: source destination [statusCode]
 
-# Redirect /app to /app.html
+# Friendly routes
 /app /app.html 200
-
-# Redirect /login to /login.html
 /login /login.html 200
-
-# Redirect /onboarding to /onboarding.html
 /onboarding /onboarding.html 200
-
-# Redirect /chat to /app.html
 /chat /app.html 200
-
-# Redirect /chat/:conversationId to /app.html (single-page app)
 /chat/* /app.html 200
-
-# Redirect /perfil to authenticated /app.html
 /perfil /app.html 200
-
-# Redirect /herramientas/* to /app.html (tool routes)
 /herramientas/* /app.html 200
-
-# Redirect /historial to /app.html
 /historial /app.html 200
 
-# Legal routes (public pages)
+# Legal routes
 /legal /terminos.html 200
 /privacy /privacidad.html 200
 /privacy-policy /privacidad.html 200
 /terms /terminos.html 200
 /legal-notice /aviso-legal.html 200
 /cookie-policy /cookies.html 200
-
-# API routes pass through (Cloudflare Functions)
-/api/* /api/* 200
-
-# Catch-all: SPA fallback (if no matching file, serve index.html)
-/* /index.html 200

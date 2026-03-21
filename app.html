@@ -477,6 +477,10 @@
 
     const email = requireSesion();
     const usuario = getUsuarioActual();
+    if (!email || !usuario) {
+      window.location.replace('/login.html');
+      throw new Error('Sesion invalida');
+    }
     let conversacionActual = crearConversacion();
     let typingIndicator = null;
 
