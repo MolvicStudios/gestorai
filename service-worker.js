@@ -1,20 +1,15 @@
-const CACHE_NAME = 'gestorai-v2';
+const CACHE_NAME = 'gestorai-v2.1';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/app/dashboard.html',
   '/css/themes.css',
   '/css/main.css',
   '/css/components.css',
   '/js/auth.js',
   '/js/color-mode.js',
   '/js/plan-gate.js',
-  '/js/ia-client.js',
-  '/js/pdf-gen.js',
-  '/js/ccaa-selector.js',
   '/js/cookie-banner.js',
   '/manifest.json',
-  '/assets/logo.svg',
 ];
 
 // Instalar: pre-cachear recursos esenciales (individual para no fallar si uno no existe)
