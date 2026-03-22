@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gestorai-v1';
+const CACHE_NAME = 'gestorai-v2';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
@@ -9,6 +9,9 @@ const PRECACHE_URLS = [
   '/js/auth.js',
   '/js/color-mode.js',
   '/js/plan-gate.js',
+  '/js/ia-client.js',
+  '/js/pdf-gen.js',
+  '/js/ccaa-selector.js',
   '/js/cookie-banner.js',
   '/manifest.json',
   '/assets/logo.svg',
@@ -41,10 +44,10 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // No cachear peticiones a Supabase, Groq, Stripe, etc.
+  // No cachear peticiones a Supabase, APIs externas, etc.
   if (
     url.origin !== self.location.origin ||
-    url.pathname.startsWith('/supabase') ||
+    url.pathname.startsWith('/api') ||
     request.method !== 'GET'
   ) {
     return;

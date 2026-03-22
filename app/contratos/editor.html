@@ -115,13 +115,14 @@
 
   <script type="module">
     import { initTema } from '/js/color-mode.js';
-    import { requireAuth, getUserProfile, supabase } from '/js/auth.js';
-    import { askGroq, checkDailyLimit, registrarConsulta, PROMPTS } from '/js/groq-client.js';
-    import { generarPDF } from '/js/pdf-gen.js';
+    import { initAuth, getUser, supabase } from '/js/auth.js';
+    import { askIA, PROMPTS } from '/js/ia-client.js';
 
     initTema();
-    const session = await requireAuth();
-    const profile = await getUserProfile();
+    await initAuth();
+    const user = await getUser();
+    if (!user) { window.location.href = '/'; throw new Error('No auth'); }
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
 
     // Pre-fill parte A con datos del perfil
     document.getElementById('parte-a-nombre').value = profile?.empresa || profile?.nombre || '';
@@ -154,7 +155,7 @@
       const tipo = document.getElementById('tipo').value;
       if (!tipo) { alert('Selecciona un tipo de contrato'); return; }
 
-      const canUse = await checkDailyLimit();
+      const canUse = true; // rate limiting is server-side
       if (!canUse) return;
 
       const status = document.getElementById('ia-status');
@@ -176,9 +177,12 @@ Detalles y condiciones: ${detalles || 'No especificados'}
 Genera el contrato completo con todas las cláusulas habituales para este tipo en España. Usa formato legible con numeración de cláusulas. Incluye lugar y fecha para firmas.`;
 
       try {
-        const respuesta = await askGroq(prompt);
+        const respuesta = await askIA({
+          systemPrompt: PROMPTS.contratos,
+          userPrompt: prompt,
+          modulo: 'contratos'
+        });
         document.getElementById('contenido').value = respuesta;
-        await registrarConsulta('contratos', prompt);
       } catch (err) {
         alert('Error al generar: ' + err.message);
       } finally {
@@ -205,7 +209,7 @@ Genera el contrato completo con todas las cláusulas habituales para este tipo e
             direccion: document.getElementById('parte-b-direccion').value,
           }
         },
-        user_id: session.user.id,
+        user_id: user.id,
       };
 
       if (id) {
@@ -223,16 +227,11 @@ Genera el contrato completo con todas las cláusulas habituales para este tipo e
     document.getElementById('btn-pdf').addEventListener('click', async () => {
       const contenido = document.getElementById('contenido').value;
       if (!contenido) { alert('No hay contenido para exportar'); return; }
-      const div = document.createElement('div');
-      div.style.padding = '2rem';
-      div.style.maxWidth = '800px';
-      div.style.fontFamily = 'sans-serif';
-      div.style.whiteSpace = 'pre-wrap';
-      div.style.lineHeight = '1.6';
-      div.textContent = contenido;
-      document.body.appendChild(div);
-      await generarPDF(div, `contrato-${document.getElementById('titulo').value || 'borrador'}.pdf`);
-      div.remove();
+      // Use browser print to PDF for contracts
+      const printWin = window.open('', '_blank');
+      printWin.document.write(`<html><head><title>Contrato</title><style>body{font-family:sans-serif;padding:2rem;max-width:800px;line-height:1.6;white-space:pre-wrap;}</style></head><body>${contenido.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</body></html>`);
+      printWin.document.close();
+      printWin.print();
     });
   </script>
 </body>

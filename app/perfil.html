@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es" class="tema-claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Perfil — GestorAI.pro</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar loaded by app shell -->
+    <main class="app-main">
+      <div class="container" style="max-width:720px; padding:2rem 1rem;">
+        <h1 style="font-size:1.5rem; margin-bottom:.5rem;">Mi Perfil</h1>
+        <p style="color:var(--color-text-muted); margin-bottom:2rem;">Gestiona tus datos fiscales y preferencias.</p>
+
+        <div class="card" style="padding:1.5rem; margin-bottom:1.5rem;">
+          <h2 style="font-size:1.1rem; margin-bottom:1rem;">Datos personales</h2>
+          <div class="form-group">
+            <label for="pf-nombre">Nombre completo</label>
+            <input type="text" id="pf-nombre" class="input">
+          </div>
+          <div class="form-group">
+            <label for="pf-nif">NIF / CIF</label>
+            <input type="text" id="pf-nif" class="input">
+          </div>
+          <div class="form-group">
+            <label for="pf-empresa">Empresa</label>
+            <input type="text" id="pf-empresa" class="input">
+          </div>
+          <div class="form-group">
+            <label for="pf-direccion">Dirección</label>
+            <input type="text" id="pf-direccion" class="input">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+            <div class="form-group">
+              <label for="pf-cp">Código postal</label>
+              <input type="text" id="pf-cp" class="input" maxlength="5">
+            </div>
+            <div class="form-group">
+              <label for="pf-ciudad">Ciudad</label>
+              <input type="text" id="pf-ciudad" class="input">
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:1.5rem; margin-bottom:1.5rem;">
+          <h2 style="font-size:1.1rem; margin-bottom:1rem;">Comunidad Autónoma</h2>
+          <div id="ccaa-container"></div>
+          <div id="regimen-info" style="margin-top:1rem;"></div>
+        </div>
+
+        <div class="card" style="padding:1.5rem; margin-bottom:1.5rem;">
+          <h2 style="font-size:1.1rem; margin-bottom:1rem;">Plan actual</h2>
+          <p>Tu plan: <strong id="user-plan">Free</strong></p>
+          <p style="color:var(--color-text-muted); font-size:.9rem;" id="user-email"></p>
+          <a href="https://josemole5.gumroad.com/l/gestorai-pro" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:1rem;" id="btn-upgrade">Mejorar a Pro</a>
+        </div>
+
+        <button class="btn btn-primary" id="btn-save" style="width:100%;">Guardar cambios</button>
+        <button class="btn btn-ghost" id="btn-logout" style="width:100%; margin-top:.75rem; color:var(--color-danger);">Cerrar sesión</button>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initAuth, initAppPage, getUser, updateProfile, supabase as sb } from '/js/auth.js';
+    import { renderCCAAGrid, renderRegimenPanel, saveCCAAToProfile } from '/js/ccaa-selector.js';
+
+    await initAuth();
+    await initAppPage();
+
+    const user = await getUser();
+    if (!user) { window.location.href = '/'; }
+
+    // Load profile data
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
+    if (profile) {
+      document.getElementById('pf-nombre').value = profile.nombre || '';
+      document.getElementById('pf-nif').value = profile.nif || '';
+      document.getElementById('pf-empresa').value = profile.empresa || '';
+      document.getElementById('pf-direccion').value = profile.direccion || '';
+      document.getElementById('pf-cp').value = profile.codigo_postal || '';
+      document.getElementById('pf-ciudad').value = profile.ciudad || '';
+    }
+
+    let selectedCcaa = profile?.ccaa || null;
+    renderCCAAGrid('ccaa-container', (ccaa) => {
+      selectedCcaa = ccaa.codigo;
+      renderRegimenPanel('regimen-info', ccaa);
+    });
+
+    // Hide upgrade if already Pro
+    const { data: sub } = await sb.from('subscriptions').select('plan').eq('user_id', user.id).eq('status', 'active').maybeSingle();
+    if (sub?.plan === 'pro') {
+      document.getElementById('btn-upgrade').style.display = 'none';
+      document.getElementById('user-plan').textContent = 'Pro ✨';
+    }
+
+    document.getElementById('btn-save').addEventListener('click', async () => {
+      const updates = {
+        nombre: document.getElementById('pf-nombre').value.trim(),
+        nif: document.getElementById('pf-nif').value.trim(),
+        empresa: document.getElementById('pf-empresa').value.trim(),
+        direccion: document.getElementById('pf-direccion').value.trim(),
+        codigo_postal: document.getElementById('pf-cp').value.trim(),
+        ciudad: document.getElementById('pf-ciudad').value.trim(),
+        ccaa: selectedCcaa
+      };
+      const ok = await updateProfile(updates);
+      if (ok) alert('Perfil actualizado correctamente.');
+      else alert('Error al guardar. Inténtalo de nuevo.');
+    });
+
+    document.getElementById('btn-logout').addEventListener('click', async () => {
+      await sb.auth.signOut();
+      window.location.href = '/';
+    });
+  </script>
+</body>
+</html>

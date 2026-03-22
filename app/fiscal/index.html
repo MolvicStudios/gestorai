@@ -72,9 +72,11 @@
   </div>
   <script type="module">
     import { initTema } from '/js/color-mode.js';
-    import { requireAuth } from '/js/auth.js';
+    import { initAuth, getUser } from '/js/auth.js';
     initTema();
-    await requireAuth();
+    await initAuth();
+    const user = await getUser();
+    if (!user) window.location.href = '/';
   </script>
 </body>
 </html>

@@ -99,17 +99,17 @@
 
   <script type="module">
     import { initTema } from '/js/color-mode.js';
-    import { requireAuth, getUserProfile } from '/js/auth.js';
-    import { withProAccess } from '/js/plan-gate.js';
+    import { initAuth, getUser, supabase as sb } from '/js/auth.js';
+    import { conAccesoPro } from '/js/plan-gate.js';
     import { calcularModelo130 } from '/js/fiscal/calculos-irpf.js';
-    import { askGroq, PROMPTS, checkDailyLimit, registrarConsulta } from '/js/groq-client.js';
-    import { supabase } from '/js/auth.js';
+    import { askIA, PROMPTS } from '/js/ia-client.js';
 
     initTema();
-    const session = await requireAuth();
-    if (!session) throw new Error('No auth');
-    const profile = await getUserProfile();
-    const isProOk = await withProAccess('modelos_fiscales', () => true);
+    await initAuth();
+    const user = await getUser();
+    if (!user) { window.location.href = '/'; throw new Error('No auth'); }
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
+    const isProOk = await conAccesoPro('modelos', () => true);
     if (!isProOk) throw new Error('Upgrade required');
 
     window.irPaso = function(n) {
@@ -154,30 +154,21 @@
     };
 
     document.getElementById('btn-ia-consejo').addEventListener('click', async () => {
-      const limit = await checkDailyLimit(supabase, profile?.plan || 'free');
-      if (!limit.allowed) {
-        document.dispatchEvent(new CustomEvent('gestorai:upgrade-required', {
-          detail: { feature: 'consultas_ia_dia', message: 'Has agotado tus consultas IA de hoy.' }
-        }));
-        return;
-      }
-
       const iaEl = document.getElementById('ia-response');
       iaEl.style.display = 'block';
       iaEl.innerHTML = '<div class="spinner" style="margin:1rem auto;"></div>';
 
       const ingresos = document.getElementById('ingresos').value || 0;
       const gastos = document.getElementById('gastos').value || 0;
-      const result = await askGroq({
-        systemPrompt: PROMPTS.fiscal,
-        userPrompt: `He calculado mi modelo 130 con ingresos acumulados de ${ingresos} € y gastos de ${gastos} €. ¿Tienes algún consejo o ves algo que pueda mejorar? ¿Hay gastos deducibles que debería revisar?`
-      });
-
-      if (result.success) {
-        iaEl.innerHTML = `<p style="white-space:pre-wrap;">${result.content}</p>`;
-        await registrarConsulta(supabase, 'fiscal', result.tokens);
-      } else {
-        iaEl.innerHTML = '<p style="color:var(--color-danger);">No se pudo conectar con la IA. Verifica tu clave Groq en configuración.</p>';
+      try {
+        const content = await askIA({
+          systemPrompt: PROMPTS.fiscal,
+          userPrompt: `He calculado mi modelo 130 con ingresos acumulados de ${ingresos} € y gastos de ${gastos} €. ¿Tienes algún consejo o ves algo que pueda mejorar? ¿Hay gastos deducibles que debería revisar?`,
+          modulo: 'fiscal'
+        });
+        iaEl.innerHTML = `<p style="white-space:pre-wrap;">${content}</p>`;
+      } catch (err) {
+        iaEl.innerHTML = '<p style="color:var(--color-danger);">No se pudo conectar con la IA. Inténtalo de nuevo.</p>';
       }
     });
   </script>

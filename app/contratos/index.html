@@ -59,14 +59,14 @@
 
   <script type="module">
     import { initTema } from '/js/color-mode.js';
-    import { requireAuth, supabase } from '/js/auth.js';
-    import { getLimitsForPlan } from '/js/plan-gate.js';
-    import { getUserProfile } from '/js/auth.js';
+    import { initAuth, getUser, supabase } from '/js/auth.js';
+    import { isPro } from '/js/auth.js';
 
     initTema();
-    const session = await requireAuth();
-    const profile = await getUserProfile();
-    const limits = getLimitsForPlan(profile?.plan || 'free');
+    await initAuth();
+    const user = await getUser();
+    if (!user) { window.location.href = '/'; throw new Error('No auth'); }
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
 
     const { data: contratos, error } = await supabase
       .from('contratos')

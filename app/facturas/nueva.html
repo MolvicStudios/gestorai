@@ -147,12 +147,14 @@
 
   <script type="module">
     import { initTema } from '/js/color-mode.js';
-    import { requireAuth, getUserProfile, supabase } from '/js/auth.js';
-    import { getPlanLimits, showUpgradeModal } from '/js/plan-gate.js';
+    import { initAuth, getUser, supabase, isPro } from '/js/auth.js';
+    import { verificarLimiteFactura } from '/js/plan-gate.js';
 
     initTema();
-    const session = await requireAuth();
-    const profile = await getUserProfile();
+    await initAuth();
+    const user = await getUser();
+    if (!user) { window.location.href = '/'; throw new Error('No auth'); }
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
 
     // Default date to today
     document.getElementById('fecha').valueAsDate = new Date();
@@ -242,18 +244,8 @@
     // Save
     async function guardar(estado) {
       // Check plan limits
-      const limits = await getPlanLimits();
-      if (limits.facturas_mes !== Infinity) {
-        const mesActual = new Date().toISOString().slice(0, 7);
-        const { count } = await supabase
-          .from('facturas')
-          .select('*', { count: 'exact', head: true })
-          .gte('fecha', mesActual + '-01');
-        if (count >= limits.facturas_mes) {
-          showUpgradeModal('facturas_mes');
-          return;
-        }
-      }
+      const ok = await verificarLimiteFactura();
+      if (!ok) return;
 
       const factura = buildFactura(estado);
       const { error } = await supabase.from('facturas').insert(factura);

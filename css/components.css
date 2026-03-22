@@ -378,3 +378,104 @@
   .bottom-nav { display: block; }
   .app-main { padding-bottom: 5rem; }
 }
+
+/* ─── CCAA Selector Grid ─── */
+.ccaa-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: .75rem;
+  padding: 1rem 0;
+}
+.ccaa-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .35rem;
+  padding: .75rem .5rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  font-size: .85rem;
+  text-align: center;
+  position: relative;
+}
+.ccaa-btn:hover { border-color: var(--color-primary); }
+.ccaa-btn.active {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(13, 121, 102, .15);
+  background: var(--color-surface-hover, var(--color-surface));
+}
+.ccaa-flag { font-size: 1.3rem; }
+.ccaa-name { font-weight: 600; }
+.ccaa-badge {
+  position: absolute;
+  top: 4px; right: 4px;
+  font-size: .6rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: #fff;
+}
+.ccaa-badge.igic { background: #8b5cf6; }
+.ccaa-badge.tbai { background: #0ea5e9; }
+.ccaa-badge.ipsi { background: #f59e0b; }
+
+.ccaa-regimen-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-top: 1rem;
+}
+.ccaa-regimen-panel h4 { margin-bottom: .5rem; color: var(--color-primary); }
+.ccaa-list-info {
+  list-style: none;
+  padding: 0;
+}
+.ccaa-list-info li {
+  padding: .4rem 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: .9rem;
+}
+.ccaa-list-info li:last-child { border-bottom: none; }
+
+/* ─── Onboarding Steps ─── */
+.step-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+.step-indicator {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: .9rem;
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  transition: all var(--transition);
+}
+.step-indicator.active {
+  background: var(--color-primary);
+  color: #fff;
+}
+.step-indicator.completed {
+  background: var(--color-success, #10b981);
+  color: #fff;
+}
+
+/* ─── Upgrade Modal Card ─── */
+.modal-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}

@@ -109,15 +109,7 @@
         </a>
       </div>
 
-      <!-- Groq Key config -->
-      <div class="card mb-3" id="groq-config" style="display:none;">
-        <h3 style="margin-bottom:1rem;">⚙️ Configura tu clave IA</h3>
-        <p style="color:var(--color-text-muted); font-size:0.9rem;">Necesitas una clave API de Groq para usar el asistente IA. <a href="https://console.groq.com/keys" target="_blank" rel="noopener">Obtén una gratis aquí</a>.</p>
-        <div style="display:flex; gap:0.5rem; margin-top:1rem;">
-          <input type="password" id="groq-key-input" placeholder="gsk_xxxxxxxxxxxxxxxx" style="flex:1;">
-          <button class="btn btn-primary" id="btn-save-groq">Guardar</button>
-        </div>
-      </div>
+
 
       <!-- AdSense zona (solo plan Free) -->
       <div id="adsense-zone" class="zona-adsense" style="display:none;">
@@ -164,35 +156,29 @@
         <li>Historial completo</li>
         <li>PDF sin marca de agua</li>
       </ul>
-      <button class="btn btn-primary btn-lg" style="width:100%; margin-top:1rem;" id="btn-checkout">Suscribirme a Pro</button>
-      <p style="text-align:center; font-size:0.8rem; color:var(--color-text-muted); margin-top:0.75rem;">Cancela cuando quieras. Sin permanencia.</p>
+      <a href="https://josemole5.gumroad.com/l/gestorai-pro" target="_blank" rel="noopener" class="btn btn-primary btn-lg" style="width:100%; margin-top:1rem;">Probar Pro 7 días gratis</a>
+      <p style="text-align:center; font-size:0.8rem; color:var(--color-text-muted); margin-top:0.75rem;">7 días gratis. Cancela cuando quieras.</p>
     </div>
   </div>
 
   <script type="module">
     import { initTema, ciclarTema } from '/js/color-mode.js';
-    import { requireAuth, getUserProfile, logout } from '/js/auth.js';
-    import { getGroqKey, setGroqKey } from '/js/groq-client.js';
-    import { getLimitsForPlan } from '/js/plan-gate.js';
+    import { initAuth, initAppPage, getUser, isPro, supabase as sb } from '/js/auth.js';
     import { initCookieBanner } from '/js/cookie-banner.js';
-    import { iniciarCheckout } from '/js/stripe.js';
+    await initAuth();
 
     initTema();
     initCookieBanner();
 
     // Auth guard
-    const session = await requireAuth();
-    if (!session) throw new Error('No auth');
+    const user = await getUser();
+    if (!user) { window.location.href = '/'; throw new Error('No auth'); }
+    await initAppPage();
 
     // Cargar perfil
-    const profile = await getUserProfile();
-    const plan = profile?.plan || 'free';
-    const limits = getLimitsForPlan(plan);
-
-    // UI updates
-    document.getElementById('user-name').textContent = profile?.nombre || profile?.empresa || session.user.email;
-    document.getElementById('plan-badge').textContent = plan === 'pro' ? 'Pro' : 'Free';
-    document.getElementById('plan-badge').className = `badge ${plan === 'pro' ? 'badge-pro' : 'badge-free'}`;
+    const pro = await isPro();
+    const plan = pro ? 'pro' : 'free';
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
 
     if (plan === 'free') {
       document.getElementById('upgrade-banner').style.display = 'flex';
@@ -211,35 +197,17 @@
       if (plan === 'pro') document.getElementById('stat-consultas-hint').textContent = 'Plan Pro: ilimitadas';
     }
 
-    // Groq key
-    if (!getGroqKey()) {
-      document.getElementById('groq-config').style.display = 'block';
-    }
-    document.getElementById('btn-save-groq').addEventListener('click', () => {
-      const key = document.getElementById('groq-key-input').value.trim();
-      if (key && key.startsWith('gsk_')) {
-        setGroqKey(key);
-        document.getElementById('groq-config').style.display = 'none';
-      }
-    });
-
     // Theme
     document.getElementById('btn-tema-sidebar').addEventListener('click', ciclarTema);
 
     // Logout
-    document.getElementById('nav-logout').addEventListener('click', e => { e.preventDefault(); logout(); });
+    document.getElementById('nav-logout').addEventListener('click', async e => { e.preventDefault(); await sb.auth.signOut(); window.location.href = '/'; });
 
     // Upgrade
     document.getElementById('btn-upgrade')?.addEventListener('click', () => {
       document.getElementById('modal-upgrade').classList.add('active');
     });
-    document.getElementById('btn-checkout')?.addEventListener('click', iniciarCheckout);
 
-    // Upgrade event listener
-    document.addEventListener('gestorai:upgrade-required', e => {
-      document.getElementById('upgrade-reason').textContent = e.detail.message;
-      document.getElementById('modal-upgrade').classList.add('active');
-    });
 
     // Mobile menu
     const sidebar = document.getElementById('sidebar');
@@ -247,11 +215,10 @@
     if (window.innerWidth <= 768) btnMenu.style.display = 'block';
     btnMenu.addEventListener('click', () => sidebar.classList.toggle('open'));
 
-    // Config nav
-    document.getElementById('nav-config').addEventListener('click', e => {
+    // Config nav — now goes to profile page
+    document.getElementById('nav-config')?.addEventListener('click', e => {
       e.preventDefault();
-      document.getElementById('groq-config').style.display = 'block';
-      document.getElementById('groq-config').scrollIntoView({ behavior: 'smooth' });
+      window.location.href = '/app/perfil.html';
     });
   </script>
 </body>

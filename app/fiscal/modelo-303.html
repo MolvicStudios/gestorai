@@ -84,15 +84,17 @@
 
   <script type="module">
     import { initTema } from '/js/color-mode.js';
-    import { requireAuth, getUserProfile, supabase } from '/js/auth.js';
-    import { withProAccess } from '/js/plan-gate.js';
+    import { initAuth, getUser, supabase } from '/js/auth.js';
+    import { conAccesoPro } from '/js/plan-gate.js';
     import { calcularModelo303 } from '/js/fiscal/calculos-iva.js';
-    import { askGroq, PROMPTS, checkDailyLimit, registrarConsulta } from '/js/groq-client.js';
+    import { askIA, PROMPTS } from '/js/ia-client.js';
 
     initTema();
-    const session = await requireAuth();
-    const profile = await getUserProfile();
-    await withProAccess('modelos_fiscales', () => true);
+    await initAuth();
+    const user = await getUser();
+    if (!user) { window.location.href = '/'; throw new Error('No auth'); }
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+    await conAccesoPro('modelos', () => true);
 
     const fmt = n => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -138,22 +140,18 @@
     });
 
     document.getElementById('btn-ia-consejo').addEventListener('click', async () => {
-      const limit = await checkDailyLimit(supabase, profile?.plan || 'free');
-      if (!limit.allowed) return;
-
       const iaEl = document.getElementById('ia-response');
       iaEl.style.display = 'block';
       iaEl.innerHTML = '<div class="spinner" style="margin:1rem auto;"></div>';
 
-      const result = await askGroq({
-        systemPrompt: PROMPTS.fiscal,
-        userPrompt: `He calculado mi modelo 303 de IVA trimestral. ¿Tienes algún consejo para optimizar mi IVA soportado o alertas sobre el resultado?`
-      });
-
-      if (result.success) {
-        iaEl.innerHTML = `<p style="white-space:pre-wrap;">${result.content}</p>`;
-        await registrarConsulta(supabase, 'fiscal', result.tokens);
-      } else {
+      try {
+        const content = await askIA({
+          systemPrompt: PROMPTS.fiscal,
+          userPrompt: `He calculado mi modelo 303 de IVA trimestral. ¿Tienes algún consejo para optimizar mi IVA soportado o alertas sobre el resultado?`,
+          modulo: 'fiscal'
+        });
+        iaEl.innerHTML = `<p style="white-space:pre-wrap;">${content}</p>`;
+      } catch (err) {
         iaEl.innerHTML = '<p style="color:var(--color-danger);">No se pudo conectar con la IA.</p>';
       }
     });

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es" class="tema-claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onboarding — GestorAI.pro</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--color-bg); }
+    .onboarding-container { max-width: 560px; width: 95%; padding: 2rem; }
+    .onboarding-header { text-align: center; margin-bottom: 2rem; }
+    .onboarding-header img { width: 48px; margin-bottom: .5rem; }
+    .onboarding-header h1 { font-size: 1.5rem; margin-bottom: .25rem; }
+    .onboarding-header p { color: var(--color-text-muted); font-size: .95rem; }
+    .onboarding-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+    }
+    .onboarding-nav { display: flex; justify-content: space-between; margin-top: 1.5rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; margin-bottom: .25rem; font-weight: 500; font-size: .9rem; }
+    .form-group input, .form-group select {
+      width: 100%; padding: .6rem .75rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-size: .95rem;
+    }
+    @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="onboarding-container">
+    <div class="onboarding-header">
+      <img src="/assets/logo.svg" alt="GestorAI">
+      <h1>Configura tu cuenta</h1>
+      <p>Completa tu perfil para personalizar la experiencia.</p>
+    </div>
+
+    <!-- Step indicators -->
+    <div class="step-indicators">
+      <div class="step-indicator active">1</div>
+      <div class="step-indicator">2</div>
+      <div class="step-indicator">3</div>
+    </div>
+
+    <div class="onboarding-card">
+      <!-- Step 1: Business data -->
+      <div id="step-datos-empresa">
+        <h2 style="font-size:1.2rem; margin-bottom:1rem;">Datos de tu negocio</h2>
+        <div class="form-group">
+          <label for="ob-nombre">Nombre completo *</label>
+          <input type="text" id="ob-nombre" placeholder="Tu nombre" required>
+        </div>
+        <div class="form-group">
+          <label for="ob-nif">NIF / CIF *</label>
+          <input type="text" id="ob-nif" placeholder="12345678A" required>
+        </div>
+        <div class="form-group">
+          <label for="ob-empresa">Nombre empresa (opcional)</label>
+          <input type="text" id="ob-empresa" placeholder="Mi Empresa SL">
+        </div>
+        <div class="form-group">
+          <label for="ob-direccion">Dirección</label>
+          <input type="text" id="ob-direccion" placeholder="Calle, número, piso">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ob-cp">Código postal</label>
+            <input type="text" id="ob-cp" placeholder="28001" maxlength="5">
+          </div>
+          <div class="form-group">
+            <label for="ob-ciudad">Ciudad</label>
+            <input type="text" id="ob-ciudad" placeholder="Madrid">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="ob-actividad">Tipo de actividad</label>
+          <select id="ob-actividad">
+            <option value="autonomo">Autónomo</option>
+            <option value="sl">Sociedad Limitada (SL)</option>
+            <option value="sa">Sociedad Anónima (SA)</option>
+            <option value="cooperativa">Cooperativa</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div class="onboarding-nav">
+          <div></div>
+          <button class="btn btn-primary" data-next>Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: CCAA + Regime -->
+      <div id="step-regimen-ccaa" style="display:none;">
+        <h2 style="font-size:1.2rem; margin-bottom:1rem;">Tu Comunidad Autónoma</h2>
+        <p style="color:var(--color-text-muted); margin-bottom:1rem; font-size:.9rem;">Selecciona tu CCAA para adaptar impuestos y normativa.</p>
+        <div id="ccaa-container"></div>
+        <div id="regimen-info" style="display:none; margin-top:1rem;"></div>
+        <div class="onboarding-nav">
+          <button class="btn btn-secondary" data-prev>← Atrás</button>
+          <button class="btn btn-primary" data-next>Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Confirmation -->
+      <div id="step-confirmacion" style="display:none;">
+        <h2 style="font-size:1.2rem; margin-bottom:1rem;">Confirmación</h2>
+        <p style="color:var(--color-text-muted); margin-bottom:1rem; font-size:.9rem;">Revisa tus datos antes de continuar.</p>
+        <div id="confirm-summary"></div>
+        <div class="onboarding-nav" style="margin-top:1.5rem;">
+          <button class="btn btn-secondary" data-prev>← Atrás</button>
+          <button class="btn btn-primary" id="btn-finish">✓ Completar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initAuth } from '/js/auth.js';
+    import { initOnboarding } from '/js/onboarding.js';
+    await initAuth();
+    initOnboarding();
+  </script>
+</body>
+</html>

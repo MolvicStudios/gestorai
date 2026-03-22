@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es" class="tema-claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clientes — GestorAI.pro</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="app-layout">
+    <main class="app-main">
+      <div class="container" style="max-width:900px; padding:2rem 1rem;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem;">
+          <div>
+            <h1 style="font-size:1.5rem; margin-bottom:.25rem;">Clientes</h1>
+            <p style="color:var(--color-text-muted); font-size:.9rem;">Gestiona tu cartera de clientes.</p>
+          </div>
+          <a href="/app/clientes/nuevo.html" class="btn btn-primary btn-sm">+ Nuevo cliente</a>
+        </div>
+
+        <!-- Search -->
+        <div style="margin-bottom:1.5rem;">
+          <input type="search" id="buscar-cliente" placeholder="Buscar por nombre o NIF..." class="input" style="width:100%; max-width:400px;">
+        </div>
+
+        <!-- Client list -->
+        <div id="lista-clientes">
+          <div class="empty-state" id="empty-clientes">
+            <p>No tienes clientes registrados todavía.</p>
+            <a href="/app/clientes/nuevo.html" class="btn btn-primary btn-sm">Añadir primer cliente</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initAuth, initAppPage, getUser, supabase as sb } from '/js/auth.js';
+
+    await initAuth();
+    await initAppPage();
+
+    const user = await getUser();
+    if (!user) { window.location.href = '/'; }
+
+    const listaEl = document.getElementById('lista-clientes');
+    const emptyEl = document.getElementById('empty-clientes');
+    const searchEl = document.getElementById('buscar-cliente');
+
+    let clientes = [];
+
+    async function loadClientes() {
+      const { data, error } = await sb.from('clientes').select('*').eq('user_id', user.id).order('nombre');
+      if (error) { console.error(error); return; }
+      clientes = data || [];
+      renderClientes(clientes);
+    }
+
+    function renderClientes(list) {
+      if (list.length === 0) {
+        emptyEl.style.display = 'block';
+        return;
+      }
+      emptyEl.style.display = 'none';
+      listaEl.innerHTML = list.map(c => `
+        <div class="card" style="padding:1rem; margin-bottom:.75rem; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <strong>${esc(c.nombre)}</strong>
+            ${c.nif ? `<span style="color:var(--color-text-muted); margin-left:.5rem; font-size:.85rem;">NIF: ${esc(c.nif)}</span>` : ''}
+            ${c.email ? `<br><span style="color:var(--color-text-muted); font-size:.85rem;">${esc(c.email)}</span>` : ''}
+          </div>
+          <div style="display:flex; gap:.5rem;">
+            <a href="/app/clientes/nuevo.html?id=${c.id}" class="btn btn-secondary btn-sm">Editar</a>
+            <button class="btn btn-ghost btn-sm" style="color:var(--color-danger);" onclick="eliminarCliente('${c.id}')">Eliminar</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    searchEl.addEventListener('input', () => {
+      const q = searchEl.value.toLowerCase().trim();
+      if (!q) { renderClientes(clientes); return; }
+      renderClientes(clientes.filter(c =>
+        (c.nombre || '').toLowerCase().includes(q) || (c.nif || '').toLowerCase().includes(q)
+      ));
+    });
+
+    window.eliminarCliente = async (id) => {
+      if (!confirm('¿Eliminar este cliente?')) return;
+      const { error } = await sb.from('clientes').delete().eq('id', id).eq('user_id', user.id);
+      if (error) { alert('Error al eliminar'); return; }
+      await loadClientes();
+    };
+
+    await loadClientes();
+  </script>
+</body>
+</html>

@@ -46,11 +46,12 @@
 
   <script type="module">
     import { initTema } from '/js/color-mode.js';
-    import { requireAuth, supabase } from '/js/auth.js';
+    import { initAuth, getUser, supabase } from '/js/auth.js';
 
     initTema();
-    const session = await requireAuth();
-    if (!session) throw new Error('No auth');
+    await initAuth();
+    const user = await getUser();
+    if (!user) { window.location.href = '/'; throw new Error('No auth'); }
 
     // Cargar facturas
     const { data: facturas } = await supabase

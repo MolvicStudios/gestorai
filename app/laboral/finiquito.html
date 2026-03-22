@@ -123,12 +123,12 @@
 
   <script type="module">
     import { initTema } from '/js/color-mode.js';
-    import { requireAuth, getUserProfile } from '/js/auth.js';
+    import { initAuth, getUser } from '/js/auth.js';
     import { calcularFiniquito } from '/js/fiscal/calculos-ss.js';
-    import { askGroq, checkDailyLimit, registrarConsulta, PROMPTS } from '/js/groq-client.js';
+    import { askIA, PROMPTS } from '/js/ia-client.js';
 
     initTema();
-    await requireAuth();
+    await initAuth();
 
     const fmt = n => Number(n).toLocaleString('es-ES', { minimumFractionDigits: 2 });
 
@@ -189,7 +189,7 @@
     document.getElementById('btn-ia').addEventListener('click', async () => {
       const pregunta = document.getElementById('ia-pregunta').value.trim();
       if (!pregunta) return;
-      const canUse = await checkDailyLimit();
+      const canUse = true; // rate limiting is server-side
       if (!canUse) return;
 
       const respDiv = document.getElementById('ia-respuesta');
@@ -197,9 +197,12 @@
       respDiv.textContent = 'Consultando IA...';
 
       try {
-        const resp = await askGroq(`${PROMPTS.laboral}\n\nPregunta sobre finiquito: ${pregunta}`);
+        const resp = await askIA({
+          systemPrompt: PROMPTS.laboral,
+          userPrompt: pregunta,
+          modulo: 'laboral'
+        });
         respDiv.textContent = resp;
-        await registrarConsulta('laboral', pregunta);
       } catch (err) {
         respDiv.textContent = 'Error: ' + err.message;
       }

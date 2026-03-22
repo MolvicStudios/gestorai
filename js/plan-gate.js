@@ -1,61 +1,67 @@
-// js/plan-gate.js — Gestión acceso Free vs Pro
-import { getUserProfile } from './auth.js';
+// js/plan-gate.js — Control Free / Pro + modal Gumroad
+import { isPro, supabase as sb } from './auth.js';
 
-// Límites plan Free
-const FREE_LIMITS = {
-  facturas_mes: 3,
-  contratos_mes: 1,
-  consultas_ia_dia: 5,
-  modelos_fiscales: false,
-  nominas: false,
-  pdf_marca_agua: true,
-  historial: false,
-  exportar_excel: false
-};
+const GUMROAD_URL = 'https://josemole5.gumroad.com/l/gestorai-pro';
 
-// Todo disponible en Pro
-const PRO_LIMITS = {
-  facturas_mes: Infinity,
-  contratos_mes: Infinity,
-  consultas_ia_dia: Infinity,
-  modelos_fiscales: true,
-  nominas: true,
-  pdf_marca_agua: false,
-  historial: true,
-  exportar_excel: true
-};
-
-export async function getPlanLimits() {
-  const profile = await getUserProfile();
-  return profile?.plan === 'pro' ? PRO_LIMITS : FREE_LIMITS;
+/* ----------  Verificación facturas (RPC server-side)  ---------- */
+export async function verificarLimiteFactura() {
+  const pro = await isPro();
+  if (pro) return true;
+  const { data, error } = await sb.rpc('contar_facturas_mes');
+  if (error) { console.error(error); return false; }
+  if (data >= 3) { mostrarUpgradeModal('facturas'); return false; }
+  return true;
 }
 
-export function getLimitsForPlan(plan) {
-  return plan === 'pro' ? PRO_LIMITS : FREE_LIMITS;
-}
+/* ----------  Wrapper genérico  ---------- */
+export async function conAccesoPro(feature, fn) {
+  const pro = await isPro();
+  if (pro) return fn();
 
-// Muestra modal de upgrade si la función no está disponible
-export function showUpgradeModal(feature) {
-  const messages = {
-    facturas_mes: 'Has llegado al límite de 3 facturas mensuales del plan Free.',
-    modelos_fiscales: 'Los modelos fiscales (130, 303, 111) están disponibles solo en el plan Pro.',
-    nominas: 'La calculadora de nóminas está disponible solo en el plan Pro.',
-    consultas_ia_dia: 'Has usado tus 5 consultas IA de hoy. El plan Pro incluye consultas ilimitadas.',
-    contratos_mes: 'Has llegado al límite de 1 contrato mensual del plan Free.'
+  const limites = {
+    modelos: false, nominas: false, historial: false,
+    exportar: false, contratos_extra: false
   };
-
-  const msg = messages[feature] || 'Esta función está disponible solo en el plan Pro.';
-  document.dispatchEvent(new CustomEvent('gestorai:upgrade-required', {
-    detail: { feature, message: msg, precio: '19,90 €/mes' }
-  }));
+  if (limites[feature] === false) { mostrarUpgradeModal(feature); return null; }
+  return fn();
 }
 
-// Wrapper para acciones que requieren Pro
-export async function withProAccess(feature, action) {
-  const limits = await getPlanLimits();
-  if (limits[feature] === false || limits[feature] === 0) {
-    showUpgradeModal(feature);
-    return false;
+/* ----------  Modal upgrade  ---------- */
+export function mostrarUpgradeModal(feature) {
+  const msgs = {
+    facturas:  'Has alcanzado el límite de 3 facturas/mes del plan Free.',
+    modelos:   'Los modelos fiscales están disponibles en el plan Pro.',
+    nominas:   'La calculadora de nóminas es exclusiva del plan Pro.',
+    ia:        'Has agotado tus 5 consultas IA de hoy.',
+    historial: 'El historial completo está en el plan Pro.',
+    exportar:  'La exportación a Excel es exclusiva del plan Pro.',
+    default:   'Esta función requiere el plan Pro.'
+  };
+  const msg = msgs[feature] || msgs.default;
+
+  // Reusar modal existente o crear
+  let modal = document.getElementById('modal-upgrade');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-upgrade';
+    modal.className = 'modal-overlay';
+    document.body.appendChild(modal);
   }
-  return await action();
+  modal.innerHTML = `
+    <div class="modal-card">
+      <h3>⚡ Pasa a Pro</h3>
+      <p>${msg}</p>
+      <ul style="text-align:left;margin:1rem 0;line-height:1.8">
+        <li>✅ Facturas y contratos ilimitados</li>
+        <li>✅ Modelos fiscales + nóminas</li>
+        <li>✅ IA ilimitada · PDF sin marca de agua</li>
+        <li>✅ 7 días de prueba GRATIS</li>
+      </ul>
+      <p style="font-size:1.5rem;font-weight:700;color:var(--primary)">19,90 €/mes</p>
+      <a href="${GUMROAD_URL}" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%;margin:.5rem 0">
+        Empezar prueba gratuita
+      </a>
+      <button onclick="this.closest('.modal-overlay').remove()" class="btn btn-secondary" style="width:100%">Ahora no</button>
+    </div>`;
+  modal.style.display = 'flex';
 }

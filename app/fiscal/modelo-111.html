@@ -75,12 +75,14 @@
 
   <script type="module">
     import { initTema } from '/js/color-mode.js';
-    import { requireAuth } from '/js/auth.js';
-    import { withProAccess } from '/js/plan-gate.js';
+    import { initAuth, getUser } from '/js/auth.js';
+    import { conAccesoPro } from '/js/plan-gate.js';
 
     initTema();
-    await requireAuth();
-    await withProAccess('modelos_fiscales', () => true);
+    await initAuth();
+    const user = await getUser();
+    if (!user) { window.location.href = '/'; throw new Error('No auth'); }
+    await conAccesoPro('modelos', () => true);
 
     const fmt = n => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
