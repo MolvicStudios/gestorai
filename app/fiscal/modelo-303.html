@@ -85,12 +85,14 @@
   <script type="module">
     import { initTema } from '/js/color-mode.js';
     import { initAuth, getUser, supabase } from '/js/auth.js';
+    import { initChatbot } from '/js/chatbot.js';
     import { conAccesoPro } from '/js/plan-gate.js';
     import { calcularModelo303 } from '/js/fiscal/calculos-iva.js';
     import { askIA, PROMPTS } from '/js/ia-client.js';
 
     initTema();
     await initAuth();
+    initChatbot();
     const user = await getUser();
     if (!user) { window.location.href = '/'; throw new Error('No auth'); }
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();

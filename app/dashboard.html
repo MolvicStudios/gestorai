@@ -164,8 +164,10 @@
   <script type="module">
     import { initTema, ciclarTema } from '/js/color-mode.js';
     import { initAuth, initAppPage, getUser, isPro, supabase as sb } from '/js/auth.js';
+    import { initChatbot } from '/js/chatbot.js';
     import { initCookieBanner } from '/js/cookie-banner.js';
     await initAuth();
+    initChatbot();
 
     initTema();
     initCookieBanner();

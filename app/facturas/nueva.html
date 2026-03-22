@@ -148,10 +148,12 @@
   <script type="module">
     import { initTema } from '/js/color-mode.js';
     import { initAuth, getUser, supabase, isPro } from '/js/auth.js';
+    import { initChatbot } from '/js/chatbot.js';
     import { verificarLimiteFactura } from '/js/plan-gate.js';
 
     initTema();
     await initAuth();
+    initChatbot();
     const user = await getUser();
     if (!user) { window.location.href = '/'; throw new Error('No auth'); }
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();

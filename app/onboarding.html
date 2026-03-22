@@ -125,8 +125,10 @@
 
   <script type="module">
     import { initAuth } from '/js/auth.js';
+    import { initChatbot } from '/js/chatbot.js';
     import { initOnboarding } from '/js/onboarding.js';
     await initAuth();
+    initChatbot();
     initOnboarding();
   </script>
 </body>

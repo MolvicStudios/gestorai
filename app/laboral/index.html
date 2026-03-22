@@ -93,8 +93,10 @@
   <script type="module">
     import { initTema } from '/js/color-mode.js';
     import { initAuth, getUser } from '/js/auth.js';
+    import { initChatbot } from '/js/chatbot.js';
     initTema();
     await initAuth();
+    initChatbot();
     const user = await getUser();
     if (!user) window.location.href = '/';
   </script>

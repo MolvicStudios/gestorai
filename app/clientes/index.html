@@ -40,8 +40,10 @@
 
   <script type="module">
     import { initAuth, initAppPage, getUser, supabase as sb } from '/js/auth.js';
+    import { initChatbot } from '/js/chatbot.js';
 
     await initAuth();
+    initChatbot();
     await initAppPage();
 
     const user = await getUser();

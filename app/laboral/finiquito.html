@@ -124,11 +124,13 @@
   <script type="module">
     import { initTema } from '/js/color-mode.js';
     import { initAuth, getUser } from '/js/auth.js';
+    import { initChatbot } from '/js/chatbot.js';
     import { calcularFiniquito } from '/js/fiscal/calculos-ss.js';
     import { askIA, PROMPTS } from '/js/ia-client.js';
 
     initTema();
     await initAuth();
+    initChatbot();
 
     const fmt = n => Number(n).toLocaleString('es-ES', { minimumFractionDigits: 2 });
 
