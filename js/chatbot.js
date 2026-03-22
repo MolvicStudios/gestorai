@@ -244,6 +244,7 @@ function injectStyles() {
       display: flex;
       flex-direction: column;
       gap: .6rem;
+      background: var(--color-bg);
     }
     .chat-msg { display: flex; }
     .chat-msg-user { justify-content: flex-end; }
@@ -262,7 +263,7 @@ function injectStyles() {
       border-bottom-right-radius: .2rem;
     }
     .chat-msg-assistant .chat-bubble {
-      background: var(--color-bg-alt, #f1f5f9);
+      background: var(--color-surface-2, #f1f5f9);
       color: var(--color-text, #1e293b);
       border-bottom-left-radius: .2rem;
     }
@@ -317,6 +318,7 @@ function injectStyles() {
       outline: none;
       font-family: inherit;
     }
+    #chat-input::placeholder { color: var(--color-text-muted, #94a3b8); }
     #chat-input:focus { border-color: var(--color-primary, #0D7966); }
     #chat-send {
       width: 40px; height: 40px;

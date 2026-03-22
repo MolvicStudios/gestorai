@@ -47,6 +47,123 @@
               <input type="text" id="pf-ciudad" class="input">
             </div>
           </div>
+          <div class="form-group">
+            <label for="pf-forma-juridica">Forma jurídica</label>
+            <select id="pf-forma-juridica" class="input">
+              <option value="autonomo">Autónomo / Persona física</option>
+              <option value="sl">Sociedad Limitada (SL)</option>
+              <option value="slu">Sociedad Limitada Unipersonal (SLU)</option>
+              <option value="sa">Sociedad Anónima (SA)</option>
+              <option value="slp">Sociedad Limitada Profesional (SLP)</option>
+              <option value="cb">Comunidad de Bienes (CB)</option>
+              <option value="sc">Sociedad Civil (SC)</option>
+              <option value="cooperativa">Cooperativa</option>
+              <option value="asociacion">Asociación / Fundación</option>
+              <option value="otro_forma">Otro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="pf-actividad">Sector profesional</label>
+            <select id="pf-actividad" class="input">
+              <optgroup label="Tecnología e Informática">
+                <option value="desarrollo_software">Desarrollo de software</option>
+                <option value="diseno_web">Diseño y desarrollo web</option>
+                <option value="consultoria_it">Consultoría IT / Transformación digital</option>
+                <option value="ciberseguridad">Ciberseguridad</option>
+                <option value="datos_ia">Datos e inteligencia artificial</option>
+                <option value="soporte_tecnico">Soporte técnico y sistemas</option>
+                <option value="telecomunicaciones">Telecomunicaciones</option>
+              </optgroup>
+              <optgroup label="Arquitectura e Ingeniería">
+                <option value="arquitectura">Arquitectura</option>
+                <option value="ingenieria_civil">Ingeniería civil</option>
+                <option value="ingenieria_industrial">Ingeniería industrial</option>
+                <option value="topografia">Topografía y cartografía</option>
+              </optgroup>
+              <optgroup label="Legal y Jurídico">
+                <option value="abogacia">Abogacía</option>
+                <option value="asesoria_fiscal">Asesoría fiscal y tributaria</option>
+                <option value="gestoria">Gestoría administrativa</option>
+                <option value="notaria">Notaría y registro</option>
+                <option value="procuraduria">Procuraduría</option>
+              </optgroup>
+              <optgroup label="Finanzas y Contabilidad">
+                <option value="contabilidad">Contabilidad y auditoría</option>
+                <option value="banca_seguros">Banca y seguros</option>
+                <option value="inversion_finanzas">Inversión y finanzas</option>
+                <option value="administracion_fincas">Administración de fincas</option>
+              </optgroup>
+              <optgroup label="Salud y Bienestar">
+                <option value="medicina">Medicina general / Especialista</option>
+                <option value="odontologia">Odontología</option>
+                <option value="psicologia">Psicología y psiquiatría</option>
+                <option value="fisioterapia">Fisioterapia y rehabilitación</option>
+                <option value="farmacia">Farmacia</option>
+                <option value="veterinaria">Veterinaria</option>
+                <option value="nutricion">Nutrición y dietética</option>
+                <option value="optica">Óptica y optometría</option>
+              </optgroup>
+              <optgroup label="Creatividad y Comunicación">
+                <option value="diseno_grafico">Diseño gráfico</option>
+                <option value="fotografia_video">Fotografía y vídeo</option>
+                <option value="publicidad_marketing">Publicidad y marketing</option>
+                <option value="periodismo">Periodismo y medios</option>
+                <option value="traduccion">Traducción e interpretación</option>
+                <option value="produccion_audiovisual">Producción audiovisual</option>
+              </optgroup>
+              <optgroup label="Formación y Educación">
+                <option value="formacion_academica">Formación académica</option>
+                <option value="formacion_profesional">Formación profesional / Coaching</option>
+                <option value="idiomas">Enseñanza de idiomas</option>
+                <option value="educacion_infantil">Educación infantil</option>
+              </optgroup>
+              <optgroup label="Hostelería y Restauración">
+                <option value="restaurante_bar">Restaurante / Bar / Cafetería</option>
+                <option value="hotel_alojamiento">Hotel / Alojamiento turístico</option>
+                <option value="catering">Catering y eventos</option>
+                <option value="turismo_agencia">Agencia de viajes / Turismo</option>
+              </optgroup>
+              <optgroup label="Transporte y Logística">
+                <option value="transporte_mercancias">Transporte de mercancías</option>
+                <option value="transporte_pasajeros">Transporte de pasajeros / VTC</option>
+                <option value="mensajeria">Mensajería y paquetería</option>
+                <option value="logistica_almacen">Logística y almacenamiento</option>
+              </optgroup>
+              <optgroup label="Comercio">
+                <option value="comercio_minorista">Comercio minorista</option>
+                <option value="comercio_mayorista">Comercio mayorista</option>
+                <option value="ecommerce">E-commerce</option>
+                <option value="importacion_exportacion">Importación / Exportación</option>
+              </optgroup>
+              <optgroup label="Servicios técnicos y Mantenimiento">
+                <option value="electricidad">Electricidad e instalaciones</option>
+                <option value="fontaneria">Fontanería y climatización</option>
+                <option value="construccion_reformas">Construcción y reformas</option>
+                <option value="limpieza">Limpieza profesional</option>
+                <option value="jardineria">Jardinería y paisajismo</option>
+                <option value="mecanica_auto">Mecánica y automoción</option>
+              </optgroup>
+              <optgroup label="Agricultura, Ganadería y Medio Ambiente">
+                <option value="agricultura">Agricultura</option>
+                <option value="ganaderia">Ganadería</option>
+                <option value="pesca">Pesca y acuicultura</option>
+                <option value="medio_ambiente">Medio ambiente y energías renovables</option>
+              </optgroup>
+              <optgroup label="Deporte y Ocio">
+                <option value="entrenamiento_personal">Entrenamiento personal</option>
+                <option value="gimnasio_centro">Gimnasio / Centro deportivo</option>
+                <option value="ocio_entretenimiento">Ocio y entretenimiento</option>
+              </optgroup>
+              <optgroup label="Servicios personales">
+                <option value="peluqueria_estetica">Peluquería y estética</option>
+                <option value="asistencia_domicilio">Asistencia a domicilio</option>
+                <option value="seguridad_privada">Seguridad privada</option>
+              </optgroup>
+              <optgroup label="Otros">
+                <option value="otro_sector">Otro sector no listado</option>
+              </optgroup>
+            </select>
+          </div>
         </div>
 
         <div class="card" style="padding:1.5rem; margin-bottom:1.5rem;">
@@ -89,6 +206,8 @@
       document.getElementById('pf-direccion').value = profile.direccion || '';
       document.getElementById('pf-cp').value = profile.codigo_postal || '';
       document.getElementById('pf-ciudad').value = profile.ciudad || '';
+      if (profile.forma_juridica) document.getElementById('pf-forma-juridica').value = profile.forma_juridica;
+      if (profile.tipo_actividad) document.getElementById('pf-actividad').value = profile.tipo_actividad;
     }
 
     let selectedCcaa = profile?.ccaa || null;
@@ -112,6 +231,8 @@
         direccion: document.getElementById('pf-direccion').value.trim(),
         codigo_postal: document.getElementById('pf-cp').value.trim(),
         ciudad: document.getElementById('pf-ciudad').value.trim(),
+        forma_juridica: document.getElementById('pf-forma-juridica').value,
+        tipo_actividad: document.getElementById('pf-actividad').value,
         ccaa: selectedCcaa
       };
       const ok = await updateProfile(updates);

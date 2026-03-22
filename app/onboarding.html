@@ -83,13 +83,129 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="ob-actividad">Tipo de actividad</label>
-          <select id="ob-actividad">
-            <option value="autonomo">Autónomo</option>
-            <option value="sl">Sociedad Limitada (SL)</option>
+          <label for="ob-forma-juridica">Forma jurídica</label>
+          <select id="ob-forma-juridica">
+            <option value="autonomo">Autónomo / Persona física</option>
+            <option value="sl">Sociedad Limitada (SL / SLU)</option>
             <option value="sa">Sociedad Anónima (SA)</option>
+            <option value="slp">Sociedad Limitada Profesional (SLP)</option>
+            <option value="cb">Comunidad de Bienes (CB)</option>
+            <option value="sc">Sociedad Civil (SC)</option>
             <option value="cooperativa">Cooperativa</option>
+            <option value="asociacion">Asociación / Fundación</option>
             <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="ob-actividad">Sector profesional</label>
+          <select id="ob-actividad">
+            <optgroup label="💻 Tecnología y digital">
+              <option value="desarrollo_software">Desarrollo de software</option>
+              <option value="diseno_web">Diseño web y gráfico</option>
+              <option value="marketing_digital">Marketing digital y SEO/SEM</option>
+              <option value="consultoria_it">Consultoría IT</option>
+              <option value="ecommerce">Comercio electrónico</option>
+              <option value="videojuegos">Videojuegos y apps</option>
+              <option value="ciberseguridad">Ciberseguridad</option>
+              <option value="data_ia">Datos e inteligencia artificial</option>
+            </optgroup>
+            <optgroup label="📐 Arquitectura, ingeniería y construcción">
+              <option value="arquitectura">Arquitectura</option>
+              <option value="ingenieria">Ingeniería</option>
+              <option value="construccion">Construcción y reformas</option>
+              <option value="instalaciones">Instalaciones (electricidad, fontanería, clima)</option>
+              <option value="topografia">Topografía y cartografía</option>
+            </optgroup>
+            <optgroup label="⚖️ Legal y asesoría">
+              <option value="abogacia">Abogacía</option>
+              <option value="asesoria_fiscal">Asesoría fiscal y contable</option>
+              <option value="gestoria">Gestoría administrativa</option>
+              <option value="notaria">Notaría y procuraduría</option>
+              <option value="mediacion">Mediación y arbitraje</option>
+            </optgroup>
+            <optgroup label="💰 Finanzas y seguros">
+              <option value="contabilidad">Contabilidad y auditoría</option>
+              <option value="seguros">Seguros y correduría</option>
+              <option value="finanzas">Asesoría financiera e inversiones</option>
+              <option value="inmobiliaria">Agencia inmobiliaria</option>
+            </optgroup>
+            <optgroup label="🏥 Salud y bienestar">
+              <option value="medicina">Medicina general / especialista</option>
+              <option value="odontologia">Odontología</option>
+              <option value="psicologia">Psicología</option>
+              <option value="fisioterapia">Fisioterapia y osteopatía</option>
+              <option value="farmacia">Farmacia</option>
+              <option value="veterinaria">Veterinaria</option>
+              <option value="optica">Óptica y optometría</option>
+              <option value="nutricion">Nutrición y dietética</option>
+              <option value="estetica_salud">Estética y podología</option>
+            </optgroup>
+            <optgroup label="🎨 Creatividad y comunicación">
+              <option value="fotografia">Fotografía y vídeo</option>
+              <option value="publicidad">Publicidad y comunicación</option>
+              <option value="periodismo">Periodismo y redacción</option>
+              <option value="traduccion">Traducción e interpretación</option>
+              <option value="musica">Música y producción audiovisual</option>
+              <option value="arte">Arte, ilustración y artesanía</option>
+            </optgroup>
+            <optgroup label="📚 Formación y educación">
+              <option value="formacion">Formación y coaching</option>
+              <option value="academia">Academia y clases particulares</option>
+              <option value="idiomas">Enseñanza de idiomas</option>
+              <option value="educacion_infantil">Educación infantil / guardería</option>
+            </optgroup>
+            <optgroup label="🍽️ Hostelería y alimentación">
+              <option value="restauracion">Restauración (bar, restaurante, cafetería)</option>
+              <option value="catering">Catering y eventos</option>
+              <option value="panaderia">Panadería y pastelería</option>
+              <option value="alimentacion">Comercio de alimentación</option>
+            </optgroup>
+            <optgroup label="🚗 Transporte y logística">
+              <option value="transporte_mercancias">Transporte de mercancías</option>
+              <option value="transporte_personas">Transporte de personas (taxi, VTC)</option>
+              <option value="mensajeria">Mensajería y paquetería</option>
+              <option value="logistica">Logística y almacén</option>
+            </optgroup>
+            <optgroup label="🏪 Comercio y retail">
+              <option value="comercio_minorista">Comercio minorista</option>
+              <option value="comercio_mayorista">Comercio mayorista</option>
+              <option value="moda">Moda y textil</option>
+              <option value="joyeria">Joyería y relojería</option>
+              <option value="ferreteria">Ferretería y suministros</option>
+            </optgroup>
+            <optgroup label="🔧 Servicios técnicos y mantenimiento">
+              <option value="mecanica">Mecánica y automoción</option>
+              <option value="limpieza">Limpieza profesional</option>
+              <option value="jardineria">Jardinería y paisajismo</option>
+              <option value="reparaciones">Reparaciones y mantenimiento</option>
+              <option value="seguridad_privada">Seguridad privada</option>
+            </optgroup>
+            <optgroup label="🌾 Agricultura y medio ambiente">
+              <option value="agricultura">Agricultura y ganadería</option>
+              <option value="pesca">Pesca y acuicultura</option>
+              <option value="forestal">Actividades forestales</option>
+              <option value="medio_ambiente">Consultoría medioambiental</option>
+              <option value="energias_renovables">Energías renovables</option>
+            </optgroup>
+            <optgroup label="🏋️ Deporte y ocio">
+              <option value="entrenamiento">Entrenamiento personal y fitness</option>
+              <option value="deporte">Actividades deportivas</option>
+              <option value="turismo">Turismo y agencia de viajes</option>
+              <option value="ocio">Ocio y entretenimiento</option>
+            </optgroup>
+            <optgroup label="🏠 Servicios personales">
+              <option value="peluqueria">Peluquería y barbería</option>
+              <option value="estetica">Centro de estética</option>
+              <option value="cuidado_personas">Cuidado de personas (mayores, niños)</option>
+              <option value="servicios_hogar">Servicios del hogar</option>
+            </optgroup>
+            <optgroup label="📦 Otros sectores">
+              <option value="industria">Industria y fabricación</option>
+              <option value="mineria">Minería y canteras</option>
+              <option value="investigacion">Investigación y desarrollo (I+D)</option>
+              <option value="ong">ONG y tercer sector</option>
+              <option value="otro_sector">Otro sector no listado</option>
+            </optgroup>
           </select>
         </div>
         <div class="onboarding-nav">

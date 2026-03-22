@@ -84,7 +84,13 @@ function collectStepData() {
     formData.direccion = document.getElementById('ob-direccion')?.value?.trim() || '';
     formData.codigo_postal = document.getElementById('ob-cp')?.value?.trim() || '';
     formData.ciudad = document.getElementById('ob-ciudad')?.value?.trim() || '';
-    formData.tipo_actividad = document.getElementById('ob-actividad')?.value || 'autonomo';
+    formData.forma_juridica = document.getElementById('ob-forma-juridica')?.value || 'autonomo';
+    formData.tipo_actividad = document.getElementById('ob-actividad')?.value || 'otro_sector';
+    // Get display labels
+    const actSelect = document.getElementById('ob-actividad');
+    formData._actividad_label = actSelect?.selectedOptions[0]?.textContent || formData.tipo_actividad;
+    const fjSelect = document.getElementById('ob-forma-juridica');
+    formData._fj_label = fjSelect?.selectedOptions[0]?.textContent || formData.forma_juridica;
   }
 }
 
@@ -96,7 +102,8 @@ function renderConfirmation() {
       <h4>${formData.empresa || formData.nombre}</h4>
       <p><strong>NIF:</strong> ${formData.nif}</p>
       <p><strong>Dirección:</strong> ${formData.direccion} ${formData.codigo_postal} ${formData.ciudad}</p>
-      <p><strong>Actividad:</strong> ${formData.tipo_actividad}</p>
+      <p><strong>Forma jurídica:</strong> ${formData._fj_label}</p>
+      <p><strong>Sector:</strong> ${formData._actividad_label}</p>
       <p><strong>CCAA:</strong> ${formData.ccaa}</p>
       ${formData.ccaaData?.igic ? '<span class="badge">IGIC</span>' : ''}
       ${formData.ccaaData?.tbai ? '<span class="badge">TicketBAI</span>' : ''}
@@ -115,6 +122,7 @@ async function finishOnboarding() {
     direccion: formData.direccion,
     codigo_postal: formData.codigo_postal,
     ciudad: formData.ciudad,
+    forma_juridica: formData.forma_juridica,
     tipo_actividad: formData.tipo_actividad,
     ccaa: formData.ccaa,
     onboarding_done: true

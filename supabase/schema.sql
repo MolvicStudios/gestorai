@@ -22,7 +22,10 @@ CREATE TABLE public.profiles (
   telefono      TEXT,
   regimen_iva   TEXT DEFAULT 'general' CHECK (regimen_iva IN ('general', 'simplificado', 'recargo', 'exento')),
   regimen_irpf  TEXT DEFAULT 'estimacion_directa' CHECK (regimen_irpf IN ('estimacion_directa', 'modulos')),
-  tipo_actividad TEXT,  -- epígrafe IAE
+  tipo_actividad TEXT,  -- sector profesional
+  forma_juridica TEXT,  -- forma jurídica (autonomo, sl, sa, etc.)
+  ccaa           TEXT,  -- comunidad autónoma
+  onboarding_done BOOLEAN DEFAULT FALSE,
   groq_key_hint TEXT,  -- primeros 8 chars de la key (seguridad UX)
   stripe_customer_id TEXT,
   created_at    TIMESTAMPTZ DEFAULT NOW(),
