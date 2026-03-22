@@ -17,10 +17,16 @@ const PRECACHE_URLS = [
   '/assets/logo.svg',
 ];
 
-// Instalar: pre-cachear recursos esenciales
+// Instalar: pre-cachear recursos esenciales (individual para no fallar si uno no existe)
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.all(
+        PRECACHE_URLS.map((url) =>
+          cache.add(url).catch(() => console.warn('SW: no se pudo cachear', url))
+        )
+      )
+    )
   );
   self.skipWaiting();
 });
