@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es" class="tema-claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Finiquito — GestorAI.pro</title>
+  <meta name="theme-color" content="#0D7966">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img src="/assets/logo.svg" alt="GestorAI" class="sidebar-logo" width="32" height="32">
+        <span class="sidebar-brand">GestorAI</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/app/dashboard.html">📊 Dashboard</a>
+        <div class="nav-section">Gestión</div>
+        <a href="/app/facturas/index.html">🧾 Facturas</a>
+        <a href="/app/fiscal/index.html">📋 Fiscal</a>
+        <a href="/app/contratos/index.html">📝 Contratos</a>
+        <a href="/app/laboral/index.html" class="active">👥 Laboral</a>
+      </nav>
+    </aside>
+    <main class="app-main">
+      <div class="app-topbar">
+        <div>
+          <a href="/app/laboral/index.html" style="font-size:0.85rem; color:var(--color-text-muted);">← Volver a Laboral</a>
+          <h1>📋 Calculadora de Finiquito</h1>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <p style="font-size:0.9rem; color:var(--color-text-muted);">Calcula el finiquito estimado incluyendo vacaciones no disfrutadas, parte proporcional de pagas extras y salario pendiente. Cálculos orientativos basados en normativa 2025.</p>
+      </div>
+
+      <!-- Formulario -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <h2 style="font-size:1.1rem; margin-bottom:1rem;">Datos del empleado</h2>
+        <div class="grid-2col" style="gap:1rem;">
+          <div>
+            <label for="salario-bruto">Salario bruto mensual (€)</label>
+            <input type="number" id="salario-bruto" step="0.01" value="2000">
+          </div>
+          <div>
+            <label for="num-pagas">Número de pagas</label>
+            <select id="num-pagas">
+              <option value="12">12 pagas</option>
+              <option value="14" selected>14 pagas</option>
+            </select>
+          </div>
+          <div>
+            <label for="fecha-inicio">Fecha de inicio</label>
+            <input type="date" id="fecha-inicio" required>
+          </div>
+          <div>
+            <label for="fecha-fin">Fecha de baja</label>
+            <input type="date" id="fecha-fin" required>
+          </div>
+          <div>
+            <label for="dias-vacaciones-total">Días de vacaciones anuales</label>
+            <input type="number" id="dias-vacaciones-total" value="30" min="0">
+          </div>
+          <div>
+            <label for="dias-vacaciones-disfrutados">Días de vacaciones disfrutados</label>
+            <input type="number" id="dias-vacaciones-disfrutados" value="0" min="0">
+          </div>
+          <div>
+            <label for="motivo">Motivo de baja</label>
+            <select id="motivo">
+              <option value="baja_voluntaria">Baja voluntaria</option>
+              <option value="despido_procedente">Despido procedente</option>
+              <option value="despido_improcedente">Despido improcedente</option>
+              <option value="fin_contrato">Fin de contrato temporal</option>
+              <option value="ere">ERE / Despido colectivo</option>
+            </select>
+          </div>
+          <div>
+            <label for="tipo-irpf">Retención IRPF (%)</label>
+            <input type="number" id="tipo-irpf" step="0.01" value="15" min="0" max="47">
+          </div>
+        </div>
+        <button class="btn btn-primary" id="btn-calcular" style="margin-top:1.5rem; width:100%;">🧮 Calcular finiquito</button>
+      </div>
+
+      <!-- Resultado -->
+      <div class="card" id="resultado" style="display:none; margin-bottom:1.5rem;">
+        <h2 style="font-size:1.1rem; margin-bottom:1rem;">Desglose del finiquito</h2>
+        <table>
+          <tbody>
+            <tr><td>Salario días trabajados del mes</td><td style="text-align:right;" id="r-salario-dias"></td></tr>
+            <tr><td>Vacaciones no disfrutadas</td><td style="text-align:right;" id="r-vacaciones"></td></tr>
+            <tr><td>Parte proporcional paga extra</td><td style="text-align:right;" id="r-pagas"></td></tr>
+            <tr id="fila-indemnizacion" style="display:none;"><td>Indemnización</td><td style="text-align:right;" id="r-indemnizacion"></td></tr>
+            <tr><td><strong>Total bruto finiquito</strong></td><td style="text-align:right;"><strong id="r-bruto">—</strong></td></tr>
+            <tr><td>— Retención IRPF</td><td style="text-align:right;" id="r-irpf"></td></tr>
+            <tr><td>— SS trabajador (estimado)</td><td style="text-align:right;" id="r-ss"></td></tr>
+          </tbody>
+        </table>
+
+        <div style="margin-top:1.5rem; padding:1rem; background:var(--color-bg-alt); border-radius:8px; text-align:center;">
+          <div style="font-size:0.8rem; color:var(--color-text-muted);">FINIQUITO NETO ESTIMADO</div>
+          <div style="font-size:2rem; font-weight:700; color:var(--color-success);" id="r-neto">—</div>
+        </div>
+
+        <p style="margin-top:1rem; font-size:0.8rem; color:var(--color-text-hint);">⚠️ Cálculo orientativo. El finiquito real puede variar según convenio colectivo, complementos salariales y otros factores. Consulta con un profesional laboral.</p>
+      </div>
+
+      <!-- IA -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <h2 style="font-size:1.1rem; margin-bottom:0.5rem;">🤖 Consulta IA sobre finiquitos</h2>
+        <textarea id="ia-pregunta" rows="3" placeholder="Ej: ¿Me corresponde indemnización si llevo 3 años y me despiden improcedentemente?"></textarea>
+        <button class="btn btn-secondary" id="btn-ia" style="margin-top:0.5rem;">🤖 Preguntar</button>
+        <div id="ia-respuesta" style="display:none; margin-top:1rem; padding:1rem; background:var(--color-bg-alt); border-radius:8px; white-space:pre-wrap;"></div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initTema } from '/js/color-mode.js';
+    import { requireAuth, getUserProfile } from '/js/auth.js';
+    import { calcularFiniquito } from '/js/fiscal/calculos-ss.js';
+    import { askGroq, checkDailyLimit, registrarConsulta, PROMPTS } from '/js/groq-client.js';
+
+    initTema();
+    await requireAuth();
+
+    const fmt = n => Number(n).toLocaleString('es-ES', { minimumFractionDigits: 2 });
+
+    // Poner fechas por defecto
+    const hoy = new Date();
+    const hace1anio = new Date(hoy);
+    hace1anio.setFullYear(hoy.getFullYear() - 1);
+    document.getElementById('fecha-fin').value = hoy.toISOString().split('T')[0];
+    document.getElementById('fecha-inicio').value = hace1anio.toISOString().split('T')[0];
+
+    document.getElementById('btn-calcular').addEventListener('click', () => {
+      const salarioBruto = parseFloat(document.getElementById('salario-bruto').value) || 0;
+      const numPagas = parseInt(document.getElementById('num-pagas').value);
+      const fechaInicio = new Date(document.getElementById('fecha-inicio').value);
+      const fechaFin = new Date(document.getElementById('fecha-fin').value);
+      const diasVacTotal = parseInt(document.getElementById('dias-vacaciones-total').value) || 30;
+      const diasVacDisfrutados = parseInt(document.getElementById('dias-vacaciones-disfrutados').value) || 0;
+      const motivo = document.getElementById('motivo').value;
+      const tipoIRPF = parseFloat(document.getElementById('tipo-irpf').value) || 0;
+
+      if (fechaFin <= fechaInicio) { alert('La fecha de baja debe ser posterior a la de inicio'); return; }
+
+      const result = calcularFiniquito({
+        salarioBrutoMensual: salarioBruto,
+        numPagas,
+        fechaInicio,
+        fechaFin,
+        diasVacacionesTotales: diasVacTotal,
+        diasVacacionesDisfrutados: diasVacDisfrutados,
+        motivo,
+      });
+
+      document.getElementById('r-salario-dias').textContent = `${fmt(result.salarioDiasTrabajados)} €`;
+      document.getElementById('r-vacaciones').textContent = `${fmt(result.vacacionesPendientes)} €`;
+      document.getElementById('r-pagas').textContent = `${fmt(result.pagasExtras)} €`;
+
+      if (result.indemnizacion > 0) {
+        document.getElementById('fila-indemnizacion').style.display = '';
+        document.getElementById('r-indemnizacion').textContent = `${fmt(result.indemnizacion)} €`;
+      } else {
+        document.getElementById('fila-indemnizacion').style.display = 'none';
+      }
+
+      const bruto = result.totalBruto;
+      const irpf = bruto * tipoIRPF / 100;
+      const ssEstimado = bruto * 0.0635; // 4.70% CC + 1.55% desempleo + 0.10% FP
+      const neto = bruto - irpf - ssEstimado;
+
+      document.getElementById('r-bruto').textContent = `${fmt(bruto)} €`;
+      document.getElementById('r-irpf').textContent = `−${fmt(irpf)} €`;
+      document.getElementById('r-ss').textContent = `−${fmt(ssEstimado)} €`;
+      document.getElementById('r-neto').textContent = `${fmt(neto)} €`;
+
+      document.getElementById('resultado').style.display = '';
+    });
+
+    // IA
+    document.getElementById('btn-ia').addEventListener('click', async () => {
+      const pregunta = document.getElementById('ia-pregunta').value.trim();
+      if (!pregunta) return;
+      const canUse = await checkDailyLimit();
+      if (!canUse) return;
+
+      const respDiv = document.getElementById('ia-respuesta');
+      respDiv.style.display = '';
+      respDiv.textContent = 'Consultando IA...';
+
+      try {
+        const resp = await askGroq(`${PROMPTS.laboral}\n\nPregunta sobre finiquito: ${pregunta}`);
+        respDiv.textContent = resp;
+        await registrarConsulta('laboral', pregunta);
+      } catch (err) {
+        respDiv.textContent = 'Error: ' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

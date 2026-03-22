@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es" class="tema-claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modelo 130 — GestorAI.pro</title>
+  <meta name="theme-color" content="#0D7966">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img src="/assets/logo.svg" alt="GestorAI" class="sidebar-logo" width="32" height="32">
+        <span class="sidebar-brand">GestorAI</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/app/dashboard.html">📊 Dashboard</a>
+        <div class="nav-section">Gestión</div>
+        <a href="/app/facturas/index.html">🧾 Facturas</a>
+        <a href="/app/fiscal/index.html" class="active">📋 Fiscal</a>
+        <a href="/app/contratos/index.html">📝 Contratos</a>
+        <a href="/app/laboral/index.html">👥 Laboral</a>
+      </nav>
+    </aside>
+    <main class="app-main">
+      <div class="app-topbar">
+        <div>
+          <a href="/app/fiscal/index.html" style="font-size:0.85rem; color:var(--color-text-muted);">← Volver a Fiscal</a>
+          <h1>Modelo 130 — IRPF</h1>
+          <p style="color:var(--color-text-muted); margin:0;">Estimación directa simplificada. Pago fraccionado trimestral.</p>
+        </div>
+      </div>
+
+      <!-- Wizard -->
+      <div class="wizard">
+        <div class="wizard-steps">
+          <div class="wizard-step active" data-step="1"><span class="wizard-step-num">1</span> Ingresos</div>
+          <div class="wizard-divider"></div>
+          <div class="wizard-step" data-step="2"><span class="wizard-step-num">2</span> Gastos</div>
+          <div class="wizard-divider"></div>
+          <div class="wizard-step" data-step="3"><span class="wizard-step-num">3</span> Resultado</div>
+        </div>
+
+        <!-- Paso 1: Ingresos -->
+        <div class="wizard-panel active card" data-panel="1">
+          <h3>¿Cuánto has facturado este trimestre?</h3>
+          <p class="tooltip-trigger" data-tooltip="Suma de bases imponibles de todas tus facturas emitidas en el trimestre. No incluyas el IVA." style="color:var(--color-text-muted); font-size:0.9rem;">
+            Incluye todas las facturas emitidas (base imponible, sin IVA).
+          </p>
+          <div class="form-group mt-2">
+            <label for="ingresos">Ingresos acumulados en el año (€)</label>
+            <input type="number" id="ingresos" placeholder="Ej: 8500" min="0" step="0.01" inputmode="decimal" style="font-size:24px; text-align:center;">
+          </div>
+          <div class="wizard-actions">
+            <div></div>
+            <button class="btn btn-primary" onclick="irPaso(2)">Siguiente →</button>
+          </div>
+        </div>
+
+        <!-- Paso 2: Gastos -->
+        <div class="wizard-panel card" data-panel="2">
+          <h3>¿Cuánto has gastado en tu actividad?</h3>
+          <p style="color:var(--color-text-muted); font-size:0.9rem;">Suma de gastos deducibles acumulados en el año.</p>
+          <div class="form-group mt-2">
+            <label for="gastos">Gastos deducibles acumulados (€)</label>
+            <input type="number" id="gastos" placeholder="Ej: 3200" min="0" step="0.01" inputmode="decimal" style="font-size:24px; text-align:center;">
+          </div>
+          <div class="form-group">
+            <label for="pagos-ant">Pagos fraccionados anteriores en el año (€)</label>
+            <input type="number" id="pagos-ant" placeholder="0" min="0" step="0.01" inputmode="decimal">
+          </div>
+          <div class="form-group">
+            <label for="retenciones">Retenciones soportadas en facturas (€)</label>
+            <input type="number" id="retenciones" placeholder="0" min="0" step="0.01" inputmode="decimal">
+          </div>
+          <div class="wizard-actions">
+            <button class="btn btn-secondary" onclick="irPaso(1)">← Anterior</button>
+            <button class="btn btn-primary" onclick="calcular()">Calcular resultado →</button>
+          </div>
+        </div>
+
+        <!-- Paso 3: Resultado -->
+        <div class="wizard-panel card" data-panel="3">
+          <div id="resultado-area"></div>
+          <div class="mt-2">
+            <button class="btn btn-secondary" onclick="irPaso(2)">← Modificar datos</button>
+            <button class="btn btn-primary" id="btn-ia-consejo">🤖 Pedir consejo a la IA</button>
+          </div>
+          <div id="ia-response" class="card mt-2" style="display:none; background:var(--color-primary-light);"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initTema } from '/js/color-mode.js';
+    import { requireAuth, getUserProfile } from '/js/auth.js';
+    import { withProAccess } from '/js/plan-gate.js';
+    import { calcularModelo130 } from '/js/fiscal/calculos-irpf.js';
+    import { askGroq, PROMPTS, checkDailyLimit, registrarConsulta } from '/js/groq-client.js';
+    import { supabase } from '/js/auth.js';
+
+    initTema();
+    const session = await requireAuth();
+    if (!session) throw new Error('No auth');
+    const profile = await getUserProfile();
+    const isProOk = await withProAccess('modelos_fiscales', () => true);
+    if (!isProOk) throw new Error('Upgrade required');
+
+    window.irPaso = function(n) {
+      document.querySelectorAll('.wizard-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.wizard-step').forEach(s => {
+        const step = parseInt(s.dataset.step);
+        s.classList.remove('active', 'done');
+        if (step < n) s.classList.add('done');
+        if (step === n) s.classList.add('active');
+      });
+      document.querySelector(`[data-panel="${n}"]`).classList.add('active');
+    };
+
+    window.calcular = function() {
+      const data = {
+        ingresosAcumulados: parseFloat(document.getElementById('ingresos').value) || 0,
+        gastosAcumulados: parseFloat(document.getElementById('gastos').value) || 0,
+        pagosAnteriores: parseFloat(document.getElementById('pagos-ant').value) || 0,
+        retencionesAcumuladas: parseFloat(document.getElementById('retenciones').value) || 0
+      };
+      const r = calcularModelo130(data);
+      const fmt = n => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      document.getElementById('resultado-area').innerHTML = `
+        <h3>📊 Resultado del cálculo — Modelo 130</h3>
+        <div style="font-family:var(--font-mono); margin:1rem 0; line-height:2;">
+          <div>Ingresos acumulados: <strong>${fmt(r.ingresosAcumulados)} €</strong></div>
+          <div>(−) Gastos deducibles: <strong>${fmt(r.gastosAcumulados)} €</strong></div>
+          <div>(=) Rendimiento neto: <strong>${fmt(r.rendimientoNeto)} €</strong></div>
+          <div>(×) Tipo aplicable: <strong>${r.tipoAplicable}%</strong></div>
+          <div>(=) Cuota íntegra: <strong>${fmt(r.cuotaIntegra)} €</strong></div>
+          <div>(−) Pagos anteriores: <strong>${fmt(r.pagosAnteriores)} €</strong></div>
+          <div>(−) Retenciones soportadas: <strong>${fmt(r.retencionesAcumuladas)} €</strong></div>
+          <hr style="border-color:var(--color-border); margin:0.5rem 0;">
+          <div style="font-size:1.25rem; color:${r.aIngresar ? 'var(--color-danger)' : 'var(--color-success)'};">
+            RESULTADO: <strong>${fmt(r.resultado)} €</strong>
+            ${r.aIngresar ? '(a ingresar)' : r.aCompensar ? '(a compensar en siguiente trimestre)' : '(sin pago)'}
+          </div>
+        </div>
+      `;
+      irPaso(3);
+    };
+
+    document.getElementById('btn-ia-consejo').addEventListener('click', async () => {
+      const limit = await checkDailyLimit(supabase, profile?.plan || 'free');
+      if (!limit.allowed) {
+        document.dispatchEvent(new CustomEvent('gestorai:upgrade-required', {
+          detail: { feature: 'consultas_ia_dia', message: 'Has agotado tus consultas IA de hoy.' }
+        }));
+        return;
+      }
+
+      const iaEl = document.getElementById('ia-response');
+      iaEl.style.display = 'block';
+      iaEl.innerHTML = '<div class="spinner" style="margin:1rem auto;"></div>';
+
+      const ingresos = document.getElementById('ingresos').value || 0;
+      const gastos = document.getElementById('gastos').value || 0;
+      const result = await askGroq({
+        systemPrompt: PROMPTS.fiscal,
+        userPrompt: `He calculado mi modelo 130 con ingresos acumulados de ${ingresos} € y gastos de ${gastos} €. ¿Tienes algún consejo o ves algo que pueda mejorar? ¿Hay gastos deducibles que debería revisar?`
+      });
+
+      if (result.success) {
+        iaEl.innerHTML = `<p style="white-space:pre-wrap;">${result.content}</p>`;
+        await registrarConsulta(supabase, 'fiscal', result.tokens);
+      } else {
+        iaEl.innerHTML = '<p style="color:var(--color-danger);">No se pudo conectar con la IA. Verifica tu clave Groq en configuración.</p>';
+      }
+    });
+  </script>
+</body>
+</html>

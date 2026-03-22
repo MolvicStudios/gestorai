@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es" class="tema-claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor de Contrato — GestorAI.pro</title>
+  <meta name="theme-color" content="#0D7966">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img src="/assets/logo.svg" alt="GestorAI" class="sidebar-logo" width="32" height="32">
+        <span class="sidebar-brand">GestorAI</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/app/dashboard.html">📊 Dashboard</a>
+        <div class="nav-section">Gestión</div>
+        <a href="/app/facturas/index.html">🧾 Facturas</a>
+        <a href="/app/fiscal/index.html">📋 Fiscal</a>
+        <a href="/app/contratos/index.html" class="active">📝 Contratos</a>
+        <a href="/app/laboral/index.html">👥 Laboral</a>
+      </nav>
+    </aside>
+    <main class="app-main">
+      <div class="app-topbar">
+        <div>
+          <a href="/app/contratos/index.html" style="font-size:0.85rem; color:var(--color-text-muted);">← Volver a Contratos</a>
+          <h1>Editor de Contrato</h1>
+        </div>
+        <button class="btn btn-primary" id="btn-guardar">💾 Guardar</button>
+      </div>
+
+      <!-- Paso 1: Config -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <h2 style="font-size:1.1rem; margin-bottom:1rem;">1. Tipo de contrato</h2>
+        <div class="grid-2col" style="gap:1rem;">
+          <div>
+            <label for="tipo">Tipo de contrato</label>
+            <select id="tipo" required>
+              <option value="">Selecciona...</option>
+              <option value="servicios">Prestación de servicios</option>
+              <option value="confidencialidad">Confidencialidad (NDA)</option>
+              <option value="laboral_indefinido">Laboral indefinido</option>
+              <option value="laboral_temporal">Laboral temporal</option>
+              <option value="arrendamiento">Arrendamiento</option>
+              <option value="compraventa">Compraventa</option>
+              <option value="sociedad">Acuerdo de socios</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div>
+            <label for="titulo">Título del contrato</label>
+            <input type="text" id="titulo" placeholder="Ej: Contrato de servicios web">
+          </div>
+        </div>
+      </div>
+
+      <!-- Paso 2: Partes -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <h2 style="font-size:1.1rem; margin-bottom:1rem;">2. Partes del contrato</h2>
+        <div class="grid-2col" style="gap:1rem;">
+          <fieldset style="border:1px solid var(--color-border); border-radius:8px; padding:1rem;">
+            <legend style="font-size:0.85rem; font-weight:600;">Parte A (tú)</legend>
+            <label for="parte-a-nombre">Nombre / Razón social</label>
+            <input type="text" id="parte-a-nombre">
+            <label for="parte-a-nif">NIF/CIF</label>
+            <input type="text" id="parte-a-nif">
+            <label for="parte-a-direccion">Dirección</label>
+            <input type="text" id="parte-a-direccion">
+          </fieldset>
+          <fieldset style="border:1px solid var(--color-border); border-radius:8px; padding:1rem;">
+            <legend style="font-size:0.85rem; font-weight:600;">Parte B</legend>
+            <label for="parte-b-nombre">Nombre / Razón social</label>
+            <input type="text" id="parte-b-nombre">
+            <label for="parte-b-nif">NIF/CIF</label>
+            <input type="text" id="parte-b-nif">
+            <label for="parte-b-direccion">Dirección</label>
+            <input type="text" id="parte-b-direccion">
+          </fieldset>
+        </div>
+      </div>
+
+      <!-- Paso 3: Detalles -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <h2 style="font-size:1.1rem; margin-bottom:1rem;">3. Detalles adicionales</h2>
+        <label for="detalles">Describe brevemente el objeto del contrato y condiciones especiales</label>
+        <textarea id="detalles" rows="4" placeholder="Ej: Diseño y desarrollo de una web corporativa por 3.000 €, plazo de entrega 30 días, pago 50% al inicio y 50% a la entrega..."></textarea>
+      </div>
+
+      <!-- Generar y editar -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <h2 style="font-size:1.1rem;">4. Contrato generado</h2>
+          <button class="btn btn-primary" id="btn-generar">🤖 Generar con IA</button>
+        </div>
+        <div id="ia-status" style="display:none; margin-bottom:1rem;">
+          <div class="spinner" style="display:inline-block; width:20px; height:20px;"></div>
+          <span style="color:var(--color-text-muted);">Generando contrato...</span>
+        </div>
+        <textarea id="contenido" rows="20" placeholder="Aquí aparecerá el contrato generado por IA. También puedes escribir o pegar tu propio texto." style="font-family:var(--font-mono); font-size:0.9rem;"></textarea>
+      </div>
+
+      <div style="display:flex; gap:1rem; justify-content:flex-end; margin-bottom:2rem;">
+        <button class="btn btn-secondary" id="btn-pdf">📄 Descargar PDF</button>
+        <button class="btn btn-primary" id="btn-guardar-2">💾 Guardar contrato</button>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initTema } from '/js/color-mode.js';
+    import { requireAuth, getUserProfile, supabase } from '/js/auth.js';
+    import { askGroq, checkDailyLimit, registrarConsulta, PROMPTS } from '/js/groq-client.js';
+    import { generarPDF } from '/js/pdf-gen.js';
+
+    initTema();
+    const session = await requireAuth();
+    const profile = await getUserProfile();
+
+    // Pre-fill parte A con datos del perfil
+    document.getElementById('parte-a-nombre').value = profile?.empresa || profile?.nombre || '';
+    document.getElementById('parte-a-nif').value = profile?.nif || '';
+    document.getElementById('parte-a-direccion').value = [profile?.direccion, profile?.codigo_postal, profile?.ciudad].filter(Boolean).join(', ');
+
+    // Cargar contrato existente si ?id=
+    const id = new URLSearchParams(window.location.search).get('id');
+    if (id) {
+      const { data: c } = await supabase.from('contratos').select('*').eq('id', id).single();
+      if (c) {
+        document.getElementById('tipo').value = c.tipo || '';
+        document.getElementById('titulo').value = c.titulo || '';
+        document.getElementById('contenido').value = c.contenido || '';
+        if (c.partes) {
+          const partes = c.partes;
+          document.getElementById('parte-a-nombre').value = partes.a?.nombre || '';
+          document.getElementById('parte-a-nif').value = partes.a?.nif || '';
+          document.getElementById('parte-a-direccion').value = partes.a?.direccion || '';
+          document.getElementById('parte-b-nombre').value = partes.b?.nombre || '';
+          document.getElementById('parte-b-nif').value = partes.b?.nif || '';
+          document.getElementById('parte-b-direccion').value = partes.b?.direccion || '';
+        }
+        document.getElementById('detalles').value = c.detalles || '';
+      }
+    }
+
+    // Generar con IA
+    document.getElementById('btn-generar').addEventListener('click', async () => {
+      const tipo = document.getElementById('tipo').value;
+      if (!tipo) { alert('Selecciona un tipo de contrato'); return; }
+
+      const canUse = await checkDailyLimit();
+      if (!canUse) return;
+
+      const status = document.getElementById('ia-status');
+      status.style.display = 'flex';
+      status.style.alignItems = 'center';
+      status.style.gap = '0.5rem';
+
+      const parteA = `${document.getElementById('parte-a-nombre').value} (NIF: ${document.getElementById('parte-a-nif').value}), dirección: ${document.getElementById('parte-a-direccion').value}`;
+      const parteB = `${document.getElementById('parte-b-nombre').value} (NIF: ${document.getElementById('parte-b-nif').value}), dirección: ${document.getElementById('parte-b-direccion').value}`;
+      const detalles = document.getElementById('detalles').value;
+
+      const prompt = `${PROMPTS.contratos}
+
+Tipo de contrato: ${tipo}
+Parte A: ${parteA}
+Parte B: ${parteB}
+Detalles y condiciones: ${detalles || 'No especificados'}
+
+Genera el contrato completo con todas las cláusulas habituales para este tipo en España. Usa formato legible con numeración de cláusulas. Incluye lugar y fecha para firmas.`;
+
+      try {
+        const respuesta = await askGroq(prompt);
+        document.getElementById('contenido').value = respuesta;
+        await registrarConsulta('contratos', prompt);
+      } catch (err) {
+        alert('Error al generar: ' + err.message);
+      } finally {
+        status.style.display = 'none';
+      }
+    });
+
+    // Guardar
+    async function guardar() {
+      const data = {
+        tipo: document.getElementById('tipo').value,
+        titulo: document.getElementById('titulo').value || `Contrato ${document.getElementById('tipo').value}`,
+        contenido: document.getElementById('contenido').value,
+        detalles: document.getElementById('detalles').value,
+        partes: {
+          a: {
+            nombre: document.getElementById('parte-a-nombre').value,
+            nif: document.getElementById('parte-a-nif').value,
+            direccion: document.getElementById('parte-a-direccion').value,
+          },
+          b: {
+            nombre: document.getElementById('parte-b-nombre').value,
+            nif: document.getElementById('parte-b-nif').value,
+            direccion: document.getElementById('parte-b-direccion').value,
+          }
+        },
+        user_id: session.user.id,
+      };
+
+      if (id) {
+        await supabase.from('contratos').update(data).eq('id', id);
+      } else {
+        await supabase.from('contratos').insert(data);
+      }
+      window.location.href = '/app/contratos/index.html';
+    }
+
+    document.getElementById('btn-guardar').addEventListener('click', guardar);
+    document.getElementById('btn-guardar-2').addEventListener('click', guardar);
+
+    // PDF
+    document.getElementById('btn-pdf').addEventListener('click', async () => {
+      const contenido = document.getElementById('contenido').value;
+      if (!contenido) { alert('No hay contenido para exportar'); return; }
+      const div = document.createElement('div');
+      div.style.padding = '2rem';
+      div.style.maxWidth = '800px';
+      div.style.fontFamily = 'sans-serif';
+      div.style.whiteSpace = 'pre-wrap';
+      div.style.lineHeight = '1.6';
+      div.textContent = contenido;
+      document.body.appendChild(div);
+      await generarPDF(div, `contrato-${document.getElementById('titulo').value || 'borrador'}.pdf`);
+      div.remove();
+    });
+  </script>
+</body>
+</html>

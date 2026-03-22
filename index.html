@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es" class="tema-claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GestorAI.pro — Tu gestoría virtual 24/7 con IA</title>
+  <meta name="description" content="Gestoría automatizada con IA para autónomos y pymes españolas. Facturas, impuestos, contratos y nóminas. Desde 0 €/mes.">
+  <meta name="theme-color" content="#0D7966">
+  <link rel="canonical" href="https://gestorai.pro/">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    /* Landing-specific styles */
+    .hero {
+      text-align: center;
+      padding: 5rem 1.5rem 4rem;
+      background: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-bg) 100%);
+    }
+    .hero h1 {
+      font-size: 2.5rem;
+      max-width: 700px;
+      margin: 0 auto 1rem;
+      color: var(--color-text);
+    }
+    .hero .subtitle {
+      font-size: 1.15rem;
+      color: var(--color-text-muted);
+      max-width: 560px;
+      margin: 0 auto 2rem;
+    }
+    .hero-ctas {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .section { padding: 4rem 0; }
+    .section-title {
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .section-subtitle {
+      text-align: center;
+      color: var(--color-text-muted);
+      margin-bottom: 2.5rem;
+      max-width: 560px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .feature-card {
+      text-align: center;
+      padding: 2rem 1.5rem;
+    }
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .feature-card h3 { margin-bottom: 0.5rem; }
+    .step-num {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: var(--color-primary-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0 auto 1rem;
+    }
+    /* Pricing */
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 720px; margin: 0 auto; }
+    .pricing-card { border-radius: var(--radius-lg); padding: 2rem; text-align: center; }
+    .pricing-card.featured {
+      border: 2px solid var(--color-primary);
+      position: relative;
+    }
+    .pricing-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-primary);
+      color: var(--color-primary-text);
+      padding: 4px 16px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .pricing-price {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 1rem 0 0.25rem;
+    }
+    .pricing-period { color: var(--color-text-muted); font-size: 0.9rem; }
+    .pricing-features {
+      list-style: none;
+      text-align: left;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .pricing-features li {
+      padding: 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pricing-features li::before { content: '✓'; color: var(--color-success); font-weight: 700; }
+    .pricing-features li.disabled { opacity: 0.4; }
+    .pricing-features li.disabled::before { content: '✕'; color: var(--color-danger); }
+    /* Legal banner */
+    .legal-banner {
+      background: var(--color-primary-light);
+      border: 1px solid var(--color-primary);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 2rem;
+      text-align: center;
+      margin: 2rem 0;
+    }
+    /* FAQ */
+    .faq-item { border-bottom: 1px solid var(--color-border); }
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 1.25rem 0;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      color: var(--color-text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .faq-question::after { content: '+'; font-size: 1.25rem; color: var(--color-text-muted); }
+    .faq-question[aria-expanded="true"]::after { content: '−'; }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .faq-answer.open { max-height: 300px; padding-bottom: 1.25rem; }
+    /* Footer */
+    .footer {
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-border);
+      padding: 3rem 0 2rem;
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    .footer-title { font-weight: 600; color: var(--color-text); margin-bottom: 0.75rem; font-size: 0.95rem; }
+    .footer a { color: var(--color-text-muted); text-decoration: none; display: block; padding: 3px 0; }
+    .footer a:hover { color: var(--color-primary); }
+    .footer-bottom { text-align: center; padding-top: 1.5rem; border-top: 1px solid var(--color-border); font-size: 0.8rem; }
+    /* Login modal */
+    .login-section {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      max-width: 420px;
+      margin: 0 auto;
+      display: none;
+    }
+    .login-section.active { display: block; }
+    .login-section h2 { text-align: center; margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; margin-bottom: 0.25rem; }
+
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 1.8rem; }
+      .hero { padding: 3rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header style="position:sticky; top:0; background:var(--color-surface); border-bottom:1px solid var(--color-border); z-index:50; padding:0.75rem 1.5rem;">
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+      <a href="/" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
+        <img src="/assets/logo.svg" alt="GestorAI" width="32" height="32">
+        <span style="font-weight:700; font-size:1.1rem; color:var(--color-primary);">GestorAI<span style="color:var(--color-text-muted); font-weight:400;">.pro</span></span>
+      </a>
+      <nav style="display:flex; align-items:center; gap:1rem;">
+        <button id="btn-tema" aria-label="Cambiar tema" style="background:none; border:1px solid var(--color-border); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:1.1rem; color:var(--color-text);">
+          <span data-tema-icon>☀️</span>
+        </button>
+        <a href="#login" class="btn btn-primary btn-sm" id="cta-header">Empezar gratis</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1>Tu gestoría virtual 24/7 impulsada por IA</h1>
+    <p class="subtitle">Facturas, impuestos, contratos y nóminas. Todo lo que necesita tu negocio, automatizado con inteligencia artificial y conforme a la normativa española.</p>
+    <div class="hero-ctas">
+      <a href="#login" class="btn btn-primary btn-lg">Empezar gratis</a>
+      <a href="#como-funciona" class="btn btn-ghost btn-lg">Cómo funciona</a>
+    </div>
+  </section>
+
+  <!-- Propuesta de valor -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Todo lo que necesita tu negocio</h2>
+      <p class="section-subtitle">Automatiza tu gestoría con IA y ahorra horas cada mes.</p>
+      <div class="grid-3">
+        <div class="card feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Fiscal</h3>
+          <p style="color:var(--color-text-muted);">Modelos 130, 303, 111 calculados automáticamente. La IA te guía paso a paso y revisa tus números.</p>
+        </div>
+        <div class="card feature-card">
+          <div class="feature-icon">🧾</div>
+          <h3>Facturas</h3>
+          <p style="color:var(--color-text-muted);">Emite facturas legales en segundos con PDF profesional. Preparado para VERIFACTU 2027.</p>
+        </div>
+        <div class="card feature-card">
+          <div class="feature-icon">📝</div>
+          <h3>Contratos y nóminas</h3>
+          <p style="color:var(--color-text-muted);">Redacta contratos mercantiles y calcula nóminas con IA, cumpliendo el Estatuto de los Trabajadores.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cómo funciona -->
+  <section class="section" id="como-funciona" style="background:var(--color-surface);">
+    <div class="container">
+      <h2 class="section-title">Cómo funciona</h2>
+      <p class="section-subtitle">En 3 simples pasos empieza a gestionar tu negocio con IA.</p>
+      <div class="grid-3">
+        <div style="text-align:center; padding:1.5rem;">
+          <div class="step-num">1</div>
+          <h3 style="margin-bottom:0.5rem;">Regístrate gratis</h3>
+          <p style="color:var(--color-text-muted);">Solo necesitas un email. 0 € para empezar con el plan Free.</p>
+        </div>
+        <div style="text-align:center; padding:1.5rem;">
+          <div class="step-num">2</div>
+          <h3 style="margin-bottom:0.5rem;">Conecta tu API key</h3>
+          <p style="color:var(--color-text-muted);">Introduce tu clave Groq gratuita para activar el asistente IA.</p>
+        </div>
+        <div style="text-align:center; padding:1.5rem;">
+          <div class="step-num">3</div>
+          <h3 style="margin-bottom:0.5rem;">Gestiona todo con IA</h3>
+          <p style="color:var(--color-text-muted);">Facturas, impuestos, contratos y nóminas. La IA hace el trabajo pesado.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Planes -->
+  <section class="section" id="planes">
+    <div class="container">
+      <h2 class="section-title">Planes</h2>
+      <p class="section-subtitle">Empieza gratis y mejora cuando quieras.</p>
+      <div class="pricing-grid">
+        <!-- Free -->
+        <div class="card pricing-card">
+          <h3>Free</h3>
+          <div class="pricing-price">0 €</div>
+          <div class="pricing-period">Para siempre</div>
+          <ul class="pricing-features">
+            <li>3 facturas / mes</li>
+            <li>1 contrato / mes</li>
+            <li>5 consultas IA / día</li>
+            <li class="disabled">Sin modelos fiscales</li>
+            <li class="disabled">Sin calculadora nóminas</li>
+            <li class="disabled">Sin historial guardado</li>
+            <li class="disabled">PDF con marca de agua</li>
+          </ul>
+          <a href="#login" class="btn btn-secondary" style="width:100%;">Empezar gratis</a>
+        </div>
+        <!-- Pro -->
+        <div class="card pricing-card featured">
+          <span class="pricing-badge">Recomendado</span>
+          <h3>Pro</h3>
+          <div class="pricing-price" style="color:var(--color-primary);">19,90 €</div>
+          <div class="pricing-period">/ mes (IVA incluido)</div>
+          <ul class="pricing-features">
+            <li>Facturas ilimitadas</li>
+            <li>Contratos ilimitados</li>
+            <li>Consultas IA ilimitadas</li>
+            <li>Modelos 130, 303, 111</li>
+            <li>Calculadora nóminas</li>
+            <li>Historial completo</li>
+            <li>PDF sin marca de agua</li>
+          </ul>
+          <a href="#login" class="btn btn-primary" style="width:100%;">Empieza con Pro</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Legal banner -->
+  <section class="section" style="padding:2rem 0;">
+    <div class="container">
+      <div class="legal-banner">
+        <p style="margin:0; font-weight:600; font-size:1.05rem;">
+          🔒 Preparado para VERIFACTU 2027 · Conforme RGPD/LOPDGDD · Normativa fiscal actualizada 2025–2026
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq" style="background:var(--color-surface);">
+    <div class="container container-sm">
+      <h2 class="section-title">Preguntas frecuentes</h2>
+      <p class="section-subtitle">Resolvemos tus dudas más comunes.</p>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');this.nextElementSibling.classList.toggle('open');">
+          ¿GestorAI sustituye a un gestor profesional?
+        </button>
+        <div class="faq-answer">
+          <p>No. GestorAI es una herramienta de asistencia que automatiza cálculos y genera documentos orientativos. Siempre recomendamos revisar los resultados con un gestor colegiado antes de presentar declaraciones oficiales.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');this.nextElementSibling.classList.toggle('open');">
+          ¿Qué es la clave Groq y por qué la necesito?
+        </button>
+        <div class="faq-answer">
+          <p>Groq proporciona el motor de inteligencia artificial. Puedes obtener una clave API gratuita en groq.com. Tu clave se guarda solo en tu navegador y nunca se envía a nuestros servidores.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');this.nextElementSibling.classList.toggle('open');">
+          ¿Mis datos están seguros?
+        </button>
+        <div class="faq-answer">
+          <p>Sí. Usamos Supabase (PostgreSQL) con Row Level Security, lo que significa que cada usuario solo puede ver y modificar sus propios datos. Las comunicaciones van cifradas con TLS y no almacenamos claves de terceros en nuestros servidores.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');this.nextElementSibling.classList.toggle('open');">
+          ¿Puedo cancelar el plan Pro en cualquier momento?
+        </button>
+        <div class="faq-answer">
+          <p>Sí. Puedes cancelar desde tu panel de control. Tu plan será efectivo hasta el final del periodo ya pagado. No hay permanencia ni penalización.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');this.nextElementSibling.classList.toggle('open');">
+          ¿Las facturas generadas tienen validez legal?
+        </button>
+        <div class="faq-answer">
+          <p>Las facturas cumplen los requisitos del RD 1619/2012 y están preparadas para la normativa VERIFACTU. Aun así, es responsabilidad del emisor verificar la corrección de los datos fiscales antes de enviarlas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Login/Registro -->
+  <section class="section" id="login">
+    <div class="container">
+      <div class="login-section active">
+        <h2>Accede a GestorAI</h2>
+        <div id="login-form">
+          <div class="form-group">
+            <label for="login-email">Email</label>
+            <input type="email" id="login-email" placeholder="tu@email.com" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="login-password">Contraseña</label>
+            <input type="password" id="login-password" placeholder="Tu contraseña" required autocomplete="current-password">
+          </div>
+          <button class="btn btn-primary btn-lg" style="width:100%; margin-top:0.5rem;" id="btn-login">Iniciar sesión</button>
+          <p style="text-align:center; margin-top:1rem; font-size:0.9rem; color:var(--color-text-muted);">
+            ¿No tienes cuenta? <a href="#" id="show-register">Regístrate gratis</a>
+          </p>
+          <p style="text-align:center; font-size:0.85rem; color:var(--color-text-hint);">
+            o <a href="#" id="btn-magic-link">recibe un enlace mágico en tu email</a>
+          </p>
+          <div id="login-msg" style="margin-top:1rem;"></div>
+        </div>
+
+        <div id="register-form" style="display:none;">
+          <div class="form-group">
+            <label for="reg-email">Email</label>
+            <input type="email" id="reg-email" placeholder="tu@email.com" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="reg-password">Contraseña</label>
+            <input type="password" id="reg-password" placeholder="Mínimo 8 caracteres" required minlength="8" autocomplete="new-password">
+          </div>
+          <button class="btn btn-primary btn-lg" style="width:100%; margin-top:0.5rem;" id="btn-register">Crear cuenta gratis</button>
+          <p style="text-align:center; margin-top:1rem; font-size:0.9rem; color:var(--color-text-muted);">
+            ¿Ya tienes cuenta? <a href="#" id="show-login">Iniciar sesión</a>
+          </p>
+          <div id="register-msg" style="margin-top:1rem;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-title">GestorAI.pro</div>
+          <p>Gestoría automatizada con IA para autónomos y pymes españolas.</p>
+          <p style="font-size:0.8rem;">Desarrollado por <strong>MolvicStudios</strong></p>
+        </div>
+        <div>
+          <div class="footer-title">Producto</div>
+          <a href="#como-funciona">Cómo funciona</a>
+          <a href="#planes">Planes</a>
+          <a href="#faq">FAQ</a>
+        </div>
+        <div>
+          <div class="footer-title">Legal</div>
+          <a href="/legal/aviso-legal.html">Aviso legal</a>
+          <a href="/legal/privacidad.html">Política de privacidad</a>
+          <a href="/legal/cookies.html">Política de cookies</a>
+        </div>
+        <div>
+          <div class="footer-title">Contacto</div>
+          <a href="mailto:contacto@molvicstudios.com">contacto@molvicstudios.com</a>
+          <a href="https://wa.me/34600055882" target="_blank" rel="noopener">WhatsApp: +34 600 055 882</a>
+          <a href="https://t.me/molvicstudios" target="_blank" rel="noopener">Telegram: @molvicstudios</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 MolvicStudios. Todos los derechos reservados.</p>
+        <p>Esta plataforma es una herramienta de asistencia. No sustituye al asesoramiento de un gestor colegiado.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initTema, ciclarTema } from '/js/color-mode.js';
+    import { loginEmail, signUpEmail, loginMagicLink, getSession } from '/js/auth.js';
+    import { initCookieBanner } from '/js/cookie-banner.js';
+
+    initTema();
+    initCookieBanner();
+
+    // Comprobar si ya está autenticado
+    getSession().then(session => {
+      if (session) window.location.href = '/app/dashboard.html';
+    });
+
+    // Tema toggle
+    document.getElementById('btn-tema').addEventListener('click', ciclarTema);
+
+    // Toggle login/register forms
+    document.getElementById('show-register').addEventListener('click', e => {
+      e.preventDefault();
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('register-form').style.display = 'block';
+    });
+    document.getElementById('show-login').addEventListener('click', e => {
+      e.preventDefault();
+      document.getElementById('register-form').style.display = 'none';
+      document.getElementById('login-form').style.display = 'block';
+    });
+
+    // Login
+    document.getElementById('btn-login').addEventListener('click', async () => {
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const msgEl = document.getElementById('login-msg');
+      if (!email || !password) { msgEl.innerHTML = '<div class="alert alert-danger">Rellena todos los campos.</div>'; return; }
+      const { error } = await loginEmail(email, password);
+      if (error) { msgEl.innerHTML = `<div class="alert alert-danger">${error.message}</div>`; }
+      else { window.location.href = '/app/dashboard.html'; }
+    });
+
+    // Register
+    document.getElementById('btn-register').addEventListener('click', async () => {
+      const email = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const msgEl = document.getElementById('register-msg');
+      if (!email || !password) { msgEl.innerHTML = '<div class="alert alert-danger">Rellena todos los campos.</div>'; return; }
+      if (password.length < 8) { msgEl.innerHTML = '<div class="alert alert-danger">La contraseña debe tener al menos 8 caracteres.</div>'; return; }
+      const { error } = await signUpEmail(email, password);
+      if (error) { msgEl.innerHTML = `<div class="alert alert-danger">${error.message}</div>`; }
+      else { msgEl.innerHTML = '<div class="alert alert-success">¡Cuenta creada! Revisa tu email para verificarla.</div>'; }
+    });
+
+    // Magic Link
+    document.getElementById('btn-magic-link').addEventListener('click', async e => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const msgEl = document.getElementById('login-msg');
+      if (!email) { msgEl.innerHTML = '<div class="alert alert-danger">Introduce tu email primero.</div>'; return; }
+      const { error } = await loginMagicLink(email);
+      if (error) { msgEl.innerHTML = `<div class="alert alert-danger">${error.message}</div>`; }
+      else { msgEl.innerHTML = '<div class="alert alert-success">¡Enlace enviado! Revisa tu bandeja de entrada.</div>'; }
+    });
+  </script>
+
+  <!-- Cloudflare Web Analytics (sin cookies) -->
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "TU_CF_ANALYTICS_TOKEN"}'></script>
+
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es" class="tema-claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modelo 111 — GestorAI.pro</title>
+  <meta name="theme-color" content="#0D7966">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img src="/assets/logo.svg" alt="GestorAI" class="sidebar-logo" width="32" height="32">
+        <span class="sidebar-brand">GestorAI</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/app/dashboard.html">📊 Dashboard</a>
+        <div class="nav-section">Gestión</div>
+        <a href="/app/facturas/index.html">🧾 Facturas</a>
+        <a href="/app/fiscal/index.html" class="active">📋 Fiscal</a>
+        <a href="/app/contratos/index.html">📝 Contratos</a>
+        <a href="/app/laboral/index.html">👥 Laboral</a>
+      </nav>
+    </aside>
+    <main class="app-main">
+      <div class="app-topbar">
+        <div>
+          <a href="/app/fiscal/index.html" style="font-size:0.85rem; color:var(--color-text-muted);">← Volver a Fiscal</a>
+          <h1>Modelo 111 — Retenciones IRPF</h1>
+          <p style="color:var(--color-text-muted); margin:0;">Retenciones a trabajadores y profesionales. Trimestral.</p>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <h3 style="margin-bottom:1rem;">Retenciones a trabajadores</h3>
+        <div class="form-group">
+          <label for="num-trabajadores">Número de perceptores</label>
+          <input type="number" id="num-trabajadores" placeholder="0" min="0">
+        </div>
+        <div class="form-group">
+          <label for="base-trabajadores">Base retenciones trabajadores (€)</label>
+          <input type="number" id="base-trabajadores" placeholder="0" min="0" step="0.01" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="retenciones-trabajadores">Retenciones practicadas (€)</label>
+          <input type="number" id="retenciones-trabajadores" placeholder="0" min="0" step="0.01" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <h3 style="margin-bottom:1rem;">Retenciones a profesionales</h3>
+        <div class="form-group">
+          <label for="num-profesionales">Número de perceptores</label>
+          <input type="number" id="num-profesionales" placeholder="0" min="0">
+        </div>
+        <div class="form-group">
+          <label for="base-profesionales">Base retenciones profesionales (€)</label>
+          <input type="number" id="base-profesionales" placeholder="0" min="0" step="0.01" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="retenciones-profesionales">Retenciones practicadas (€)</label>
+          <input type="number" id="retenciones-profesionales" placeholder="0" min="0" step="0.01" inputmode="decimal">
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-lg" style="width:100%;" id="btn-calcular">Calcular Modelo 111</button>
+      <div id="resultado-area" class="card mt-3" style="display:none;"></div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initTema } from '/js/color-mode.js';
+    import { requireAuth } from '/js/auth.js';
+    import { withProAccess } from '/js/plan-gate.js';
+
+    initTema();
+    await requireAuth();
+    await withProAccess('modelos_fiscales', () => true);
+
+    const fmt = n => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    document.getElementById('btn-calcular').addEventListener('click', () => {
+      const retTrab = parseFloat(document.getElementById('retenciones-trabajadores').value) || 0;
+      const retProf = parseFloat(document.getElementById('retenciones-profesionales').value) || 0;
+      const baseTrab = parseFloat(document.getElementById('base-trabajadores').value) || 0;
+      const baseProf = parseFloat(document.getElementById('base-profesionales').value) || 0;
+      const numTrab = parseInt(document.getElementById('num-trabajadores').value) || 0;
+      const numProf = parseInt(document.getElementById('num-profesionales').value) || 0;
+      const total = retTrab + retProf;
+
+      const el = document.getElementById('resultado-area');
+      el.style.display = 'block';
+      el.innerHTML = `
+        <h3>📊 Resultado — Modelo 111</h3>
+        <div style="font-family:var(--font-mono); margin:1rem 0; line-height:2;">
+          <div><strong>Trabajadores:</strong> ${numTrab} perceptores</div>
+          <div>Base: ${fmt(baseTrab)} € — Retenciones: ${fmt(retTrab)} €</div>
+          <br>
+          <div><strong>Profesionales:</strong> ${numProf} perceptores</div>
+          <div>Base: ${fmt(baseProf)} € — Retenciones: ${fmt(retProf)} €</div>
+          <hr style="border-color:var(--color-border); margin:0.5rem 0;">
+          <div style="font-size:1.25rem; color:var(--color-danger);">
+            TOTAL A INGRESAR: <strong>${fmt(total)} €</strong>
+          </div>
+        </div>
+      `;
+    });
+  </script>
+</body>
+</html>

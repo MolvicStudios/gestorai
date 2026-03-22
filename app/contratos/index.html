@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es" class="tema-claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contratos — GestorAI.pro</title>
+  <meta name="theme-color" content="#0D7966">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img src="/assets/logo.svg" alt="GestorAI" class="sidebar-logo" width="32" height="32">
+        <span class="sidebar-brand">GestorAI</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/app/dashboard.html">📊 Dashboard</a>
+        <div class="nav-section">Gestión</div>
+        <a href="/app/facturas/index.html">🧾 Facturas</a>
+        <a href="/app/fiscal/index.html">📋 Fiscal</a>
+        <a href="/app/contratos/index.html" class="active">📝 Contratos</a>
+        <a href="/app/laboral/index.html">👥 Laboral</a>
+      </nav>
+    </aside>
+    <main class="app-main">
+      <div class="app-topbar">
+        <h1>📝 Contratos</h1>
+        <a href="/app/contratos/editor.html" class="btn btn-primary" id="btn-nuevo">+ Nuevo Contrato</a>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <p style="color:var(--color-text-muted); font-size:0.9rem;">Genera contratos profesionales con IA. Elige el tipo, completa los datos y obtén un borrador listo para revisar y firmar.</p>
+      </div>
+
+      <div id="lista-contratos">
+        <div class="spinner" style="margin:2rem auto;"></div>
+      </div>
+
+      <div id="empty-state" class="empty-state" style="display:none;">
+        <div class="empty-state-icon">📝</div>
+        <p class="empty-state-text">Aún no tienes contratos</p>
+        <a href="/app/contratos/editor.html" class="btn btn-primary">Crear primer contrato</a>
+      </div>
+    </main>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Navegación móvil">
+    <a href="/app/dashboard.html"><span>📊</span>Inicio</a>
+    <a href="/app/facturas/index.html"><span>🧾</span>Facturas</a>
+    <a href="/app/fiscal/index.html"><span>📋</span>Fiscal</a>
+    <a href="/app/contratos/index.html" class="active"><span>📝</span>Contratos</a>
+    <a href="/app/laboral/index.html"><span>👥</span>Laboral</a>
+  </nav>
+
+  <script type="module">
+    import { initTema } from '/js/color-mode.js';
+    import { requireAuth, supabase } from '/js/auth.js';
+    import { getLimitsForPlan } from '/js/plan-gate.js';
+    import { getUserProfile } from '/js/auth.js';
+
+    initTema();
+    const session = await requireAuth();
+    const profile = await getUserProfile();
+    const limits = getLimitsForPlan(profile?.plan || 'free');
+
+    const { data: contratos, error } = await supabase
+      .from('contratos')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    const container = document.getElementById('lista-contratos');
+    container.innerHTML = '';
+
+    if (!contratos || contratos.length === 0) {
+      document.getElementById('empty-state').style.display = '';
+      return;
+    }
+
+    const table = document.createElement('table');
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Título</th>
+          <th>Fecha</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${contratos.map(c => `
+          <tr>
+            <td><span class="badge">${c.tipo || '—'}</span></td>
+            <td>${c.titulo || 'Sin título'}</td>
+            <td>${new Date(c.created_at).toLocaleDateString('es-ES')}</td>
+            <td><a href="/app/contratos/editor.html?id=${c.id}" class="btn btn-secondary" style="font-size:0.8rem;">✏️ Editar</a></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    `;
+    container.appendChild(table);
+  </script>
+</body>
+</html>

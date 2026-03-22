@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es" class="tema-claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Política de Cookies — GestorAI.pro</title>
+  <meta name="theme-color" content="#0D7966">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+  <header style="padding:1rem 2rem; border-bottom:1px solid var(--color-border);">
+    <a href="/" style="text-decoration:none; color:var(--color-primary); font-weight:700; font-size:1.25rem;">GestorAI.pro</a>
+  </header>
+  <main style="max-width:800px; margin:2rem auto; padding:0 1rem;">
+    <h1>Política de Cookies</h1>
+    <p><strong>Última actualización:</strong> enero 2025</p>
+
+    <h2>1. ¿Qué son las cookies?</h2>
+    <p>Las cookies son pequeños archivos de texto que los sitios web almacenan en el navegador del usuario. Permiten recordar preferencias, mantener sesiones activas y analizar el uso del sitio.</p>
+
+    <h2>2. Cookies que utilizamos</h2>
+
+    <h3>2.1 Cookies estrictamente necesarias</h3>
+    <p>Son imprescindibles para el funcionamiento del sitio. No requieren consentimiento.</p>
+    <table>
+      <thead><tr><th>Cookie</th><th>Proveedor</th><th>Finalidad</th><th>Duración</th></tr></thead>
+      <tbody>
+        <tr><td>sb-*-auth-token</td><td>Supabase</td><td>Autenticación del usuario (sesión JWT)</td><td>Sesión / 7 días</td></tr>
+        <tr><td>gestorai_cookie_consent</td><td>GestorAI</td><td>Registra la preferencia de cookies del usuario</td><td>365 días</td></tr>
+        <tr><td>gestorai_tema</td><td>GestorAI</td><td>Preferencia de tema (claro/oscuro/contraste)</td><td>365 días</td></tr>
+      </tbody>
+    </table>
+
+    <h3>2.2 Cookies de análisis</h3>
+    <p>Utilizamos <strong>Cloudflare Web Analytics</strong>, un servicio de análisis que <strong>no utiliza cookies</strong> y no recopila datos personales. Cumple plenamente con el RGPD sin necesidad de consentimiento.</p>
+
+    <h3>2.3 Cookies publicitarias (solo plan gratuito)</h3>
+    <p>Si el usuario acepta cookies publicitarias, se cargan anuncios a través de Google AdSense. Estas cookies son de terceros:</p>
+    <table>
+      <thead><tr><th>Cookie</th><th>Proveedor</th><th>Finalidad</th><th>Duración</th></tr></thead>
+      <tbody>
+        <tr><td>__gads, __gpi</td><td>Google</td><td>Publicidad personalizada</td><td>13 meses</td></tr>
+        <tr><td>NID, CONSENT</td><td>Google</td><td>Preferencias de publicidad</td><td>6 meses</td></tr>
+      </tbody>
+    </table>
+    <p>Estas cookies solo se instalan si el usuario acepta explícitamente en el banner de cookies. Los usuarios del plan Pro no reciben publicidad ni cookies publicitarias.</p>
+
+    <h3>2.4 Almacenamiento local (localStorage)</h3>
+    <p>Además de cookies, utilizamos el almacenamiento local del navegador para:</p>
+    <ul>
+      <li><strong>gestorai_groq_key:</strong> Clave API de Groq introducida por el usuario. Se almacena exclusivamente en su navegador y nunca se envía a nuestros servidores.</li>
+      <li><strong>gestorai_ia_count / gestorai_ia_date:</strong> Contador de consultas IA diarias (plan gratuito).</li>
+    </ul>
+
+    <h2>3. Gestión de cookies</h2>
+    <p>Al acceder por primera vez, se muestra un banner que permite:</p>
+    <ul>
+      <li><strong>"Solo esenciales":</strong> Solo se instalan cookies estrictamente necesarias.</li>
+      <li><strong>"Aceptar todo":</strong> Se instalan todas las cookies, incluidas publicitarias.</li>
+    </ul>
+    <p>El usuario puede cambiar su preferencia en cualquier momento eliminando la cookie <code>gestorai_cookie_consent</code> de su navegador, o configurando las opciones de cookies en los ajustes del navegador.</p>
+
+    <h2>4. Cómo desactivar cookies en el navegador</h2>
+    <p>Puede gestionar o bloquear cookies desde la configuración de su navegador:</p>
+    <ul>
+      <li><strong>Chrome:</strong> Configuración → Privacidad y seguridad → Cookies</li>
+      <li><strong>Firefox:</strong> Ajustes → Privacidad y seguridad → Cookies y datos del sitio</li>
+      <li><strong>Safari:</strong> Preferencias → Privacidad → Cookies y datos de sitios web</li>
+      <li><strong>Edge:</strong> Configuración → Cookies y permisos del sitio</li>
+    </ul>
+    <p>Tenga en cuenta que bloquear cookies esenciales puede impedir el correcto funcionamiento de la plataforma.</p>
+
+    <h2>5. Más información</h2>
+    <p>Para cualquier consulta sobre esta política de cookies, contacte con nosotros en: <strong>contacto@molvicstudios.com</strong></p>
+  </main>
+  <footer style="text-align:center; padding:2rem; color:var(--color-text-muted); font-size:0.85rem; border-top:1px solid var(--color-border);">
+    <p>&copy; 2025 GestorAI.pro — <a href="/legal/privacidad.html">Privacidad</a> · <a href="/legal/cookies.html">Cookies</a> · <a href="/legal/aviso-legal.html">Aviso Legal</a></p>
+  </footer>
+  <script type="module">
+    import { initTema } from '/js/color-mode.js';
+    initTema();
+  </script>
+</body>
+</html>

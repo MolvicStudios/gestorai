@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es" class="tema-claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — GestorAI.pro</title>
+  <meta name="theme-color" content="#0D7966">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img src="/assets/logo.svg" alt="GestorAI" class="sidebar-logo" width="32" height="32">
+        <span class="sidebar-brand">GestorAI</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/app/dashboard.html" class="active">📊 Dashboard</a>
+        <div class="nav-section">Gestión</div>
+        <a href="/app/facturas/index.html">🧾 Facturas</a>
+        <a href="/app/fiscal/index.html">📋 Fiscal</a>
+        <a href="/app/contratos/index.html">📝 Contratos</a>
+        <a href="/app/laboral/index.html">👥 Laboral</a>
+        <div class="nav-section">Cuenta</div>
+        <a href="#" id="nav-config">⚙️ Configuración</a>
+        <a href="#" id="nav-logout">🚪 Cerrar sesión</a>
+      </nav>
+      <div class="sidebar-footer">
+        <span id="plan-badge" class="badge badge-free">Free</span>
+        <button id="btn-tema-sidebar" style="background:none; border:none; cursor:pointer; font-size:1.1rem; margin-left:0.5rem;" aria-label="Cambiar tema">
+          <span data-tema-icon>☀️</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="app-main">
+      <div class="app-topbar">
+        <div>
+          <button id="btn-menu" style="display:none; background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--color-text);" aria-label="Menú">☰</button>
+          <h1>Dashboard</h1>
+          <p style="color:var(--color-text-muted); margin:0;">Bienvenido, <span id="user-name">usuario</span></p>
+        </div>
+        <div style="display:flex; gap:0.5rem; align-items:center;">
+          <span id="ia-counter" class="badge badge-free" title="Consultas IA hoy"></span>
+        </div>
+      </div>
+
+      <!-- Upgrade banner (plan Free) -->
+      <div id="upgrade-banner" class="upgrade-banner" style="display:none;">
+        <div class="upgrade-banner-text">
+          <strong>Mejora a Pro</strong> — Facturas ilimitadas, modelos fiscales, nóminas y más por solo 19,90 €/mes.
+        </div>
+        <button class="btn" id="btn-upgrade">Mejorar ahora</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid-3 mb-3" id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-label">Facturado este año</div>
+          <div class="stat-card-value" id="stat-facturado">0 €</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Facturas emitidas</div>
+          <div class="stat-card-value" id="stat-facturas">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Consultas IA hoy</div>
+          <div class="stat-card-value" id="stat-consultas">0 / 5</div>
+          <div class="stat-card-hint" id="stat-consultas-hint">Plan Free: 5 al día</div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <h2 class="mb-2">Accesos rápidos</h2>
+      <div class="grid-2 mb-3">
+        <a href="/app/facturas/nueva.html" class="card" style="text-decoration:none; display:flex; align-items:center; gap:1rem;">
+          <span style="font-size:2rem;">🧾</span>
+          <div>
+            <h3 style="color:var(--color-text);">Nueva factura</h3>
+            <p style="color:var(--color-text-muted); margin:0; font-size:0.9rem;">Emite una factura profesional en segundos.</p>
+          </div>
+        </a>
+        <a href="/app/fiscal/index.html" class="card" style="text-decoration:none; display:flex; align-items:center; gap:1rem;">
+          <span style="font-size:2rem;">📊</span>
+          <div>
+            <h3 style="color:var(--color-text);">Modelos fiscales</h3>
+            <p style="color:var(--color-text-muted); margin:0; font-size:0.9rem;">Calcula el 130, 303 y 111 con IA.</p>
+          </div>
+        </a>
+        <a href="/app/contratos/editor.html" class="card" style="text-decoration:none; display:flex; align-items:center; gap:1rem;">
+          <span style="font-size:2rem;">📝</span>
+          <div>
+            <h3 style="color:var(--color-text);">Nuevo contrato</h3>
+            <p style="color:var(--color-text-muted); margin:0; font-size:0.9rem;">Redacta contratos con ayuda de la IA.</p>
+          </div>
+        </a>
+        <a href="/app/laboral/nomina.html" class="card" style="text-decoration:none; display:flex; align-items:center; gap:1rem;">
+          <span style="font-size:2rem;">👥</span>
+          <div>
+            <h3 style="color:var(--color-text);">Calcular nómina</h3>
+            <p style="color:var(--color-text-muted); margin:0; font-size:0.9rem;">Nóminas con desglose completo.</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Groq Key config -->
+      <div class="card mb-3" id="groq-config" style="display:none;">
+        <h3 style="margin-bottom:1rem;">⚙️ Configura tu clave IA</h3>
+        <p style="color:var(--color-text-muted); font-size:0.9rem;">Necesitas una clave API de Groq para usar el asistente IA. <a href="https://console.groq.com/keys" target="_blank" rel="noopener">Obtén una gratis aquí</a>.</p>
+        <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+          <input type="password" id="groq-key-input" placeholder="gsk_xxxxxxxxxxxxxxxx" style="flex:1;">
+          <button class="btn btn-primary" id="btn-save-groq">Guardar</button>
+        </div>
+      </div>
+
+      <!-- AdSense zona (solo plan Free) -->
+      <div id="adsense-zone" class="zona-adsense" style="display:none;">
+        Espacio publicitario — Plan Free
+      </div>
+    </main>
+  </div>
+
+  <!-- Bottom nav (mobile) -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav-items">
+      <a href="/app/dashboard.html" class="bottom-nav-item active">
+        <span class="nav-icon">📊</span> Inicio
+      </a>
+      <a href="/app/facturas/index.html" class="bottom-nav-item">
+        <span class="nav-icon">🧾</span> Facturas
+      </a>
+      <a href="/app/fiscal/index.html" class="bottom-nav-item">
+        <span class="nav-icon">📋</span> Fiscal
+      </a>
+      <a href="/app/contratos/index.html" class="bottom-nav-item">
+        <span class="nav-icon">📝</span> Contratos
+      </a>
+      <a href="/app/laboral/index.html" class="bottom-nav-item">
+        <span class="nav-icon">👥</span> Laboral
+      </a>
+    </div>
+  </nav>
+
+  <!-- Upgrade modal -->
+  <div class="modal-overlay" id="modal-upgrade">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Mejora a Pro</h2>
+        <button class="modal-close" onclick="document.getElementById('modal-upgrade').classList.remove('active');">&times;</button>
+      </div>
+      <p id="upgrade-reason">Desbloquea todas las funcionalidades de GestorAI.</p>
+      <p style="font-size:1.5rem; font-weight:700; color:var(--color-primary); margin:1rem 0;">19,90 €/mes</p>
+      <ul class="pricing-features" style="list-style:none; padding:0;">
+        <li>Facturas y contratos ilimitados</li>
+        <li>Consultas IA ilimitadas</li>
+        <li>Modelos fiscales (130, 303, 111)</li>
+        <li>Calculadora de nóminas</li>
+        <li>Historial completo</li>
+        <li>PDF sin marca de agua</li>
+      </ul>
+      <button class="btn btn-primary btn-lg" style="width:100%; margin-top:1rem;" id="btn-checkout">Suscribirme a Pro</button>
+      <p style="text-align:center; font-size:0.8rem; color:var(--color-text-muted); margin-top:0.75rem;">Cancela cuando quieras. Sin permanencia.</p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initTema, ciclarTema } from '/js/color-mode.js';
+    import { requireAuth, getUserProfile, logout } from '/js/auth.js';
+    import { getGroqKey, setGroqKey } from '/js/groq-client.js';
+    import { getLimitsForPlan } from '/js/plan-gate.js';
+    import { initCookieBanner } from '/js/cookie-banner.js';
+    import { iniciarCheckout } from '/js/stripe.js';
+
+    initTema();
+    initCookieBanner();
+
+    // Auth guard
+    const session = await requireAuth();
+    if (!session) throw new Error('No auth');
+
+    // Cargar perfil
+    const profile = await getUserProfile();
+    const plan = profile?.plan || 'free';
+    const limits = getLimitsForPlan(plan);
+
+    // UI updates
+    document.getElementById('user-name').textContent = profile?.nombre || profile?.empresa || session.user.email;
+    document.getElementById('plan-badge').textContent = plan === 'pro' ? 'Pro' : 'Free';
+    document.getElementById('plan-badge').className = `badge ${plan === 'pro' ? 'badge-pro' : 'badge-free'}`;
+
+    if (plan === 'free') {
+      document.getElementById('upgrade-banner').style.display = 'flex';
+      document.getElementById('adsense-zone').style.display = 'block';
+    }
+
+    // Stats
+    if (profile) {
+      const subs = profile.subscriptions;
+      document.getElementById('stat-facturado').textContent = `${Number(profile.facturado_anio || 0).toLocaleString('es-ES')} €`;
+      document.getElementById('stat-facturas').textContent = profile.total_facturas || 0;
+      const consultasHoy = profile.consultas_ia_hoy || 0;
+      const maxConsultas = plan === 'pro' ? '∞' : '5';
+      document.getElementById('stat-consultas').textContent = `${consultasHoy} / ${maxConsultas}`;
+      document.getElementById('ia-counter').textContent = `IA: ${consultasHoy}/${maxConsultas}`;
+      if (plan === 'pro') document.getElementById('stat-consultas-hint').textContent = 'Plan Pro: ilimitadas';
+    }
+
+    // Groq key
+    if (!getGroqKey()) {
+      document.getElementById('groq-config').style.display = 'block';
+    }
+    document.getElementById('btn-save-groq').addEventListener('click', () => {
+      const key = document.getElementById('groq-key-input').value.trim();
+      if (key && key.startsWith('gsk_')) {
+        setGroqKey(key);
+        document.getElementById('groq-config').style.display = 'none';
+      }
+    });
+
+    // Theme
+    document.getElementById('btn-tema-sidebar').addEventListener('click', ciclarTema);
+
+    // Logout
+    document.getElementById('nav-logout').addEventListener('click', e => { e.preventDefault(); logout(); });
+
+    // Upgrade
+    document.getElementById('btn-upgrade')?.addEventListener('click', () => {
+      document.getElementById('modal-upgrade').classList.add('active');
+    });
+    document.getElementById('btn-checkout')?.addEventListener('click', iniciarCheckout);
+
+    // Upgrade event listener
+    document.addEventListener('gestorai:upgrade-required', e => {
+      document.getElementById('upgrade-reason').textContent = e.detail.message;
+      document.getElementById('modal-upgrade').classList.add('active');
+    });
+
+    // Mobile menu
+    const sidebar = document.getElementById('sidebar');
+    const btnMenu = document.getElementById('btn-menu');
+    if (window.innerWidth <= 768) btnMenu.style.display = 'block';
+    btnMenu.addEventListener('click', () => sidebar.classList.toggle('open'));
+
+    // Config nav
+    document.getElementById('nav-config').addEventListener('click', e => {
+      e.preventDefault();
+      document.getElementById('groq-config').style.display = 'block';
+      document.getElementById('groq-config').scrollIntoView({ behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

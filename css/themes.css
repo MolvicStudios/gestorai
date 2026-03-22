@@ -1,0 +1,94 @@
+/* =========================================================
+   GESTORAI.PRO — Sistema de 3 modos de color
+   Aplicar clase al <html>: .tema-claro | .tema-oscuro | .tema-contraste
+   ========================================================= */
+
+/* Variables base */
+:root {
+  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --transition: 0.2s ease;
+  --font-size-base: 16px;
+  --font-size-form: 18px;
+  --font-size-h1: 2rem;
+  --font-size-h2: 1.5rem;
+  --font-size-label: 0.9rem;
+}
+
+/* ─── TEMA CLARO (defecto) ─── */
+html, html.tema-claro {
+  --color-bg: #F8F9FA;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F1F3F5;
+  --color-border: #DEE2E6;
+  --color-border-strong: #ADB5BD;
+  --color-text: #212529;
+  --color-text-muted: #6C757D;
+  --color-text-hint: #ADB5BD;
+  --color-primary: #0D7966;
+  --color-primary-hover: #0A6355;
+  --color-primary-light: #E1F5EE;
+  --color-primary-text: #FFFFFF;
+  --color-accent: #F59E0B;
+  --color-danger: #DC2626;
+  --color-danger-light: #FEF2F2;
+  --color-success: #16A34A;
+  --color-success-light: #F0FDF4;
+  --color-info: #2563EB;
+  --color-info-light: #EFF6FF;
+  --color-ads-bg: #FFFBEB;
+}
+
+/* ─── TEMA OSCURO ─── */
+html.tema-oscuro {
+  --color-bg: #0F1117;
+  --color-surface: #1A1D27;
+  --color-surface-2: #252836;
+  --color-border: #2D3148;
+  --color-border-strong: #4A5080;
+  --color-text: #E8EAF0;
+  --color-text-muted: #8B8FA8;
+  --color-text-hint: #4A5080;
+  --color-primary: #1DB994;
+  --color-primary-hover: #18A07F;
+  --color-primary-light: #0A2E25;
+  --color-primary-text: #FFFFFF;
+  --color-accent: #FBBF24;
+  --color-danger: #F87171;
+  --color-danger-light: #2D1515;
+  --color-success: #4ADE80;
+  --color-success-light: #0A2D15;
+  --color-info: #60A5FA;
+  --color-info-light: #0D1F3C;
+  --color-ads-bg: #1E1A0E;
+}
+
+/* ─── TEMA ALTO CONTRASTE (accesibilidad) ─── */
+html.tema-contraste {
+  --color-bg: #000000;
+  --color-surface: #0A0A0A;
+  --color-surface-2: #111111;
+  --color-border: #FFFFFF;
+  --color-border-strong: #FFFF00;
+  --color-text: #FFFFFF;
+  --color-text-muted: #FFFF00;
+  --color-text-hint: #CCCCCC;
+  --color-primary: #00FF88;
+  --color-primary-hover: #00CC6A;
+  --color-primary-light: #002211;
+  --color-primary-text: #000000;
+  --color-accent: #FFD700;
+  --color-danger: #FF4444;
+  --color-danger-light: #200000;
+  --color-success: #00FF44;
+  --color-success-light: #002200;
+  --color-info: #00AAFF;
+  --color-info-light: #001122;
+  --color-ads-bg: #111100;
+  /* Forzar contraste mínimo WCAG AAA */
+  --font-size-base: 18px;
+  --font-size-form: 20px;
+}

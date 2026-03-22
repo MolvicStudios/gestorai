@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es" class="tema-claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Nóminas — GestorAI.pro</title>
+  <meta name="theme-color" content="#0D7966">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img src="/assets/logo.svg" alt="GestorAI" class="sidebar-logo" width="32" height="32">
+        <span class="sidebar-brand">GestorAI</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/app/dashboard.html">📊 Dashboard</a>
+        <div class="nav-section">Gestión</div>
+        <a href="/app/facturas/index.html">🧾 Facturas</a>
+        <a href="/app/fiscal/index.html">📋 Fiscal</a>
+        <a href="/app/contratos/index.html">📝 Contratos</a>
+        <a href="/app/laboral/index.html" class="active">👥 Laboral</a>
+      </nav>
+    </aside>
+    <main class="app-main">
+      <div class="app-topbar">
+        <div>
+          <a href="/app/laboral/index.html" style="font-size:0.85rem; color:var(--color-text-muted);">← Volver a Laboral</a>
+          <h1>💰 Calculadora de Nóminas</h1>
+        </div>
+      </div>
+
+      <!-- Datos del trabajador -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <h2 style="font-size:1.1rem; margin-bottom:1rem;">Datos del trabajador</h2>
+        <div class="grid-2col" style="gap:1rem;">
+          <div>
+            <label for="salario-bruto">Salario bruto mensual (€)</label>
+            <input type="number" id="salario-bruto" step="0.01" placeholder="2.000,00" value="2000">
+          </div>
+          <div>
+            <label for="num-pagas">Número de pagas</label>
+            <select id="num-pagas">
+              <option value="12">12 pagas</option>
+              <option value="14" selected>14 pagas</option>
+            </select>
+          </div>
+          <div>
+            <label for="grupo-cotizacion">Grupo de cotización</label>
+            <select id="grupo-cotizacion">
+              <option value="1">1 - Ingenieros y Licenciados</option>
+              <option value="2">2 - Ingenieros Técnicos / Diplomados</option>
+              <option value="3">3 - Jefes Administrativos y de Taller</option>
+              <option value="4">4 - Ayudantes no titulados</option>
+              <option value="5" selected>5 - Oficiales Administrativos</option>
+              <option value="6">6 - Subalternos</option>
+              <option value="7">7 - Auxiliares Administrativos</option>
+            </select>
+          </div>
+          <div>
+            <label for="tipo-irpf">Retención IRPF (%)</label>
+            <input type="number" id="tipo-irpf" step="0.01" value="15" min="0" max="47">
+          </div>
+          <div>
+            <label for="tipo-contrato">Tipo de contrato</label>
+            <select id="tipo-contrato">
+              <option value="indefinido" selected>Indefinido</option>
+              <option value="temporal">Temporal</option>
+            </select>
+          </div>
+          <div>
+            <label for="horas-extra">Horas extra (€/mes)</label>
+            <input type="number" id="horas-extra" step="0.01" value="0" min="0">
+          </div>
+        </div>
+        <button class="btn btn-primary" id="btn-calcular" style="margin-top:1.5rem; width:100%;">🧮 Calcular nómina</button>
+      </div>
+
+      <!-- Resultado -->
+      <div class="card" id="resultado" style="display:none; margin-bottom:1.5rem;">
+        <h2 style="font-size:1.1rem; margin-bottom:1rem;">Resultado de nómina</h2>
+
+        <h3 style="font-size:0.95rem; color:var(--color-text-muted); margin-bottom:0.5rem;">Deducciones del trabajador</h3>
+        <table>
+          <tbody>
+            <tr><td>Contingencias comunes (4,70%)</td><td style="text-align:right;" id="r-cc-trab"></td></tr>
+            <tr><td>Desempleo</td><td style="text-align:right;" id="r-desempleo-trab"></td></tr>
+            <tr><td>Formación profesional (0,10%)</td><td style="text-align:right;" id="r-fp-trab"></td></tr>
+            <tr><td><strong>Total SS trabajador</strong></td><td style="text-align:right;" id="r-total-ss-trab"><strong></strong></td></tr>
+            <tr><td>Retención IRPF</td><td style="text-align:right;" id="r-irpf"></td></tr>
+          </tbody>
+        </table>
+
+        <h3 style="font-size:0.95rem; color:var(--color-text-muted); margin:1rem 0 0.5rem;">Coste empresa</h3>
+        <table>
+          <tbody>
+            <tr><td>Contingencias comunes (23,60%)</td><td style="text-align:right;" id="r-cc-emp"></td></tr>
+            <tr><td>Desempleo</td><td style="text-align:right;" id="r-desempleo-emp"></td></tr>
+            <tr><td>FOGASA (0,20%)</td><td style="text-align:right;" id="r-fogasa"></td></tr>
+            <tr><td>Formación profesional (0,60%)</td><td style="text-align:right;" id="r-fp-emp"></td></tr>
+            <tr><td>AT/EP (estimado 1,50%)</td><td style="text-align:right;" id="r-atep"></td></tr>
+            <tr><td><strong>Total SS empresa</strong></td><td style="text-align:right;" id="r-total-ss-emp"><strong></strong></td></tr>
+          </tbody>
+        </table>
+
+        <div style="margin-top:1.5rem; padding:1rem; background:var(--color-bg-alt); border-radius:8px;">
+          <div class="grid-2col" style="gap:1rem; text-align:center;">
+            <div>
+              <div style="font-size:0.8rem; color:var(--color-text-muted);">SALARIO NETO</div>
+              <div style="font-size:1.5rem; font-weight:700; color:var(--color-success);" id="r-neto">—</div>
+            </div>
+            <div>
+              <div style="font-size:0.8rem; color:var(--color-text-muted);">COSTE TOTAL EMPRESA</div>
+              <div style="font-size:1.5rem; font-weight:700; color:var(--color-primary);" id="r-coste-total">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IA Laboral -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <h2 style="font-size:1.1rem; margin-bottom:0.5rem;">🤖 Consulta IA laboral</h2>
+        <p style="font-size:0.85rem; color:var(--color-text-muted); margin-bottom:1rem;">Haz preguntas sobre la nómina, convenios, cotizaciones o normativa laboral.</p>
+        <textarea id="ia-pregunta" rows="3" placeholder="Ej: ¿Cuánto cuesta contratar a un trabajador a media jornada con salario de 1.200 €?"></textarea>
+        <button class="btn btn-secondary" id="btn-ia" style="margin-top:0.5rem;">🤖 Preguntar a IA</button>
+        <div id="ia-respuesta" style="display:none; margin-top:1rem; padding:1rem; background:var(--color-bg-alt); border-radius:8px; white-space:pre-wrap;"></div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initTema } from '/js/color-mode.js';
+    import { requireAuth, getUserProfile } from '/js/auth.js';
+    import { calcularCuotasSS } from '/js/fiscal/calculos-ss.js';
+    import { askGroq, checkDailyLimit, registrarConsulta, PROMPTS } from '/js/groq-client.js';
+
+    initTema();
+    await requireAuth();
+    const profile = await getUserProfile();
+
+    const fmt = n => Number(n).toLocaleString('es-ES', { minimumFractionDigits: 2 });
+
+    document.getElementById('btn-calcular').addEventListener('click', () => {
+      const bruto = parseFloat(document.getElementById('salario-bruto').value) || 0;
+      const pagas = parseInt(document.getElementById('num-pagas').value);
+      const tipoIRPF = parseFloat(document.getElementById('tipo-irpf').value) || 0;
+      const tipoContrato = document.getElementById('tipo-contrato').value;
+      const horasExtra = parseFloat(document.getElementById('horas-extra').value) || 0;
+
+      const base = bruto + horasExtra;
+      const result = calcularCuotasSS(base, tipoContrato);
+
+      const irpf = base * tipoIRPF / 100;
+      const neto = base - result.trabajador.total - irpf;
+      const costeTotalEmpresa = base + result.empresa.total;
+
+      document.getElementById('r-cc-trab').textContent = `${fmt(result.trabajador.contingencias_comunes)} €`;
+      document.getElementById('r-desempleo-trab').textContent = `${fmt(result.trabajador.desempleo)} €`;
+      document.getElementById('r-fp-trab').textContent = `${fmt(result.trabajador.formacion)} €`;
+      document.getElementById('r-total-ss-trab').innerHTML = `<strong>${fmt(result.trabajador.total)} €</strong>`;
+      document.getElementById('r-irpf').textContent = `${fmt(irpf)} €`;
+
+      document.getElementById('r-cc-emp').textContent = `${fmt(result.empresa.contingencias_comunes)} €`;
+      document.getElementById('r-desempleo-emp').textContent = `${fmt(result.empresa.desempleo)} €`;
+      document.getElementById('r-fogasa').textContent = `${fmt(result.empresa.fogasa)} €`;
+      document.getElementById('r-fp-emp').textContent = `${fmt(result.empresa.formacion)} €`;
+      document.getElementById('r-atep').textContent = `${fmt(result.empresa.at_ep)} €`;
+      document.getElementById('r-total-ss-emp').innerHTML = `<strong>${fmt(result.empresa.total)} €</strong>`;
+
+      document.getElementById('r-neto').textContent = `${fmt(neto)} €`;
+      document.getElementById('r-coste-total').textContent = `${fmt(costeTotalEmpresa)} €`;
+      document.getElementById('resultado').style.display = '';
+    });
+
+    // IA
+    document.getElementById('btn-ia').addEventListener('click', async () => {
+      const pregunta = document.getElementById('ia-pregunta').value.trim();
+      if (!pregunta) return;
+      const canUse = await checkDailyLimit();
+      if (!canUse) return;
+
+      const respDiv = document.getElementById('ia-respuesta');
+      respDiv.style.display = '';
+      respDiv.textContent = 'Consultando IA...';
+
+      try {
+        const resp = await askGroq(`${PROMPTS.laboral}\n\nPregunta del usuario: ${pregunta}`);
+        respDiv.textContent = resp;
+        await registrarConsulta('laboral', pregunta);
+      } catch (err) {
+        respDiv.textContent = 'Error: ' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

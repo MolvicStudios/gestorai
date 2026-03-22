@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es" class="tema-claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nueva Factura — GestorAI.pro</title>
+  <meta name="theme-color" content="#0D7966">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img src="/assets/logo.svg" alt="GestorAI" class="sidebar-logo" width="32" height="32">
+        <span class="sidebar-brand">GestorAI</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/app/dashboard.html">📊 Dashboard</a>
+        <div class="nav-section">Gestión</div>
+        <a href="/app/facturas/index.html" class="active">🧾 Facturas</a>
+        <a href="/app/fiscal/index.html">📋 Fiscal</a>
+        <a href="/app/contratos/index.html">📝 Contratos</a>
+        <a href="/app/laboral/index.html">👥 Laboral</a>
+      </nav>
+    </aside>
+    <main class="app-main">
+      <div class="app-topbar">
+        <div>
+          <a href="/app/facturas/index.html" style="font-size:0.85rem; color:var(--color-text-muted);">← Volver a Facturas</a>
+          <h1>Nueva Factura</h1>
+        </div>
+      </div>
+
+      <form id="factura-form">
+        <!-- Datos factura -->
+        <div class="card mb-3">
+          <h3 style="margin-bottom:1rem;">Datos de la factura</h3>
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="numero">Número de factura</label>
+              <input type="text" id="numero" placeholder="F-2025-001" required>
+            </div>
+            <div class="form-group">
+              <label for="fecha">Fecha</label>
+              <input type="date" id="fecha" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Datos cliente -->
+        <div class="card mb-3">
+          <h3 style="margin-bottom:1rem;">Datos del cliente</h3>
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="cliente-nombre">Nombre / Razón social</label>
+              <input type="text" id="cliente-nombre" placeholder="Nombre del cliente" required>
+            </div>
+            <div class="form-group">
+              <label for="cliente-nif">NIF / CIF</label>
+              <input type="text" id="cliente-nif" placeholder="12345678A" pattern="[0-9A-Za-z]{8,9}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="cliente-direccion">Dirección</label>
+            <input type="text" id="cliente-direccion" placeholder="Calle, número, CP, ciudad">
+          </div>
+          <div class="form-group">
+            <label for="cliente-email">Email</label>
+            <input type="email" id="cliente-email" placeholder="cliente@email.com">
+          </div>
+        </div>
+
+        <!-- Líneas -->
+        <div class="card mb-3">
+          <h3 style="margin-bottom:1rem;">Conceptos</h3>
+          <div id="lineas-container">
+            <div class="linea-factura" style="display:grid; grid-template-columns:1fr 80px 120px 40px; gap:0.5rem; align-items:end; margin-bottom:0.75rem;">
+              <div class="form-group" style="margin:0;"><label>Concepto</label><input type="text" class="linea-concepto" placeholder="Descripción del servicio" required></div>
+              <div class="form-group" style="margin:0;"><label>Uds.</label><input type="number" class="linea-cantidad" value="1" min="1"></div>
+              <div class="form-group" style="margin:0;"><label>Precio (€)</label><input type="number" class="linea-precio" placeholder="0" min="0" step="0.01" inputmode="decimal" required></div>
+              <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.linea-factura').remove(); recalcular();" style="margin-bottom:2px;">✕</button>
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-add-linea">+ Añadir concepto</button>
+        </div>
+
+        <!-- IVA / IRPF -->
+        <div class="card mb-3">
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="tipo-iva">Tipo de IVA (%)</label>
+              <select id="tipo-iva">
+                <option value="21" selected>21% — General</option>
+                <option value="10">10% — Reducido</option>
+                <option value="4">4% — Superreducido</option>
+                <option value="0">0% — Exento</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="tipo-irpf">Retención IRPF (%)</label>
+              <select id="tipo-irpf">
+                <option value="0" selected>Sin retención</option>
+                <option value="15">15% — Profesional</option>
+                <option value="7">7% — Inicio actividad</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Totales -->
+        <div class="card mb-3" style="font-family:var(--font-mono);">
+          <div style="display:flex; justify-content:space-between; padding:4px 0;">
+            <span>Base imponible:</span> <span id="total-base">0,00 €</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:4px 0;">
+            <span>IVA (<span id="label-iva">21</span>%):</span> <span id="total-iva">0,00 €</span>
+          </div>
+          <div id="row-irpf" style="display:none; justify-content:space-between; padding:4px 0;">
+            <span>IRPF (−<span id="label-irpf">15</span>%):</span> <span id="total-irpf">0,00 €</span>
+          </div>
+          <hr style="border-color:var(--color-border); margin:8px 0;">
+          <div style="display:flex; justify-content:space-between; font-size:1.25rem; font-weight:700; color:var(--color-primary);">
+            <span>TOTAL:</span> <span id="total-factura">0,00 €</span>
+          </div>
+        </div>
+
+        <!-- Notas -->
+        <div class="card mb-3">
+          <div class="form-group">
+            <label for="notas">Notas (opcional)</label>
+            <textarea id="notas" rows="3" placeholder="Condiciones de pago, observaciones..."></textarea>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:1rem;">
+          <button type="button" class="btn btn-secondary btn-lg" id="btn-borrador">Guardar borrador</button>
+          <button type="submit" class="btn btn-primary btn-lg" style="flex:1;">Emitir factura</button>
+        </div>
+        <div id="form-msg" class="mt-2"></div>
+      </form>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initTema } from '/js/color-mode.js';
+    import { requireAuth, getUserProfile, supabase } from '/js/auth.js';
+    import { getPlanLimits, showUpgradeModal } from '/js/plan-gate.js';
+
+    initTema();
+    const session = await requireAuth();
+    const profile = await getUserProfile();
+
+    // Default date to today
+    document.getElementById('fecha').valueAsDate = new Date();
+
+    const fmt = n => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    // Add line
+    document.getElementById('btn-add-linea').addEventListener('click', () => {
+      const container = document.getElementById('lineas-container');
+      const div = document.createElement('div');
+      div.className = 'linea-factura';
+      div.style.cssText = 'display:grid; grid-template-columns:1fr 80px 120px 40px; gap:0.5rem; align-items:end; margin-bottom:0.75rem;';
+      div.innerHTML = `
+        <div class="form-group" style="margin:0;"><input type="text" class="linea-concepto" placeholder="Descripción" required></div>
+        <div class="form-group" style="margin:0;"><input type="number" class="linea-cantidad" value="1" min="1"></div>
+        <div class="form-group" style="margin:0;"><input type="number" class="linea-precio" placeholder="0" min="0" step="0.01" inputmode="decimal" required></div>
+        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.linea-factura').remove(); recalcular();">✕</button>
+      `;
+      container.appendChild(div);
+    });
+
+    // Recalculate
+    window.recalcular = function() {
+      let base = 0;
+      document.querySelectorAll('.linea-factura').forEach(row => {
+        const cant = parseFloat(row.querySelector('.linea-cantidad')?.value) || 1;
+        const precio = parseFloat(row.querySelector('.linea-precio')?.value) || 0;
+        base += cant * precio;
+      });
+      const tipoIva = parseFloat(document.getElementById('tipo-iva').value);
+      const tipoIrpf = parseFloat(document.getElementById('tipo-irpf').value);
+      const cuotaIva = Math.round(base * tipoIva) / 100;
+      const cuotaIrpf = Math.round(base * tipoIrpf) / 100;
+      const total = base + cuotaIva - cuotaIrpf;
+
+      document.getElementById('total-base').textContent = fmt(base) + ' €';
+      document.getElementById('total-iva').textContent = fmt(cuotaIva) + ' €';
+      document.getElementById('label-iva').textContent = tipoIva;
+      document.getElementById('total-factura').textContent = fmt(total) + ' €';
+
+      if (tipoIrpf > 0) {
+        document.getElementById('row-irpf').style.display = 'flex';
+        document.getElementById('total-irpf').textContent = '−' + fmt(cuotaIrpf) + ' €';
+        document.getElementById('label-irpf').textContent = tipoIrpf;
+      } else {
+        document.getElementById('row-irpf').style.display = 'none';
+      }
+    };
+
+    // Listen to changes
+    document.getElementById('factura-form').addEventListener('input', recalcular);
+    document.getElementById('tipo-iva').addEventListener('change', recalcular);
+    document.getElementById('tipo-irpf').addEventListener('change', recalcular);
+
+    // Build factura data
+    function buildFactura(estado) {
+      const lineas = [];
+      document.querySelectorAll('.linea-factura').forEach(row => {
+        lineas.push({
+          concepto: row.querySelector('.linea-concepto')?.value || '',
+          cantidad: parseFloat(row.querySelector('.linea-cantidad')?.value) || 1,
+          precio: parseFloat(row.querySelector('.linea-precio')?.value) || 0
+        });
+      });
+      const base = lineas.reduce((s, l) => s + l.cantidad * l.precio, 0);
+      const tipoIva = parseFloat(document.getElementById('tipo-iva').value);
+      const tipoIrpf = parseFloat(document.getElementById('tipo-irpf').value);
+      return {
+        numero: document.getElementById('numero').value.trim(),
+        fecha: document.getElementById('fecha').value,
+        cliente_nombre: document.getElementById('cliente-nombre').value.trim(),
+        cliente_nif: document.getElementById('cliente-nif').value.trim(),
+        cliente_email: document.getElementById('cliente-email').value.trim(),
+        cliente_direccion: document.getElementById('cliente-direccion').value.trim(),
+        lineas,
+        base_imponible: Math.round(base * 100) / 100,
+        tipo_iva: tipoIva,
+        cuota_iva: Math.round(base * tipoIva) / 100,
+        tipo_irpf: tipoIrpf,
+        cuota_irpf: Math.round(base * tipoIrpf) / 100,
+        total: Math.round((base + base * tipoIva / 100 - base * tipoIrpf / 100) * 100) / 100,
+        estado,
+        notas: document.getElementById('notas').value.trim()
+      };
+    }
+
+    // Save
+    async function guardar(estado) {
+      // Check plan limits
+      const limits = await getPlanLimits();
+      if (limits.facturas_mes !== Infinity) {
+        const mesActual = new Date().toISOString().slice(0, 7);
+        const { count } = await supabase
+          .from('facturas')
+          .select('*', { count: 'exact', head: true })
+          .gte('fecha', mesActual + '-01');
+        if (count >= limits.facturas_mes) {
+          showUpgradeModal('facturas_mes');
+          return;
+        }
+      }
+
+      const factura = buildFactura(estado);
+      const { error } = await supabase.from('facturas').insert(factura);
+      const msgEl = document.getElementById('form-msg');
+      if (error) {
+        msgEl.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+      } else {
+        msgEl.innerHTML = `<div class="alert alert-success">Factura ${estado === 'borrador' ? 'guardada como borrador' : 'emitida correctamente'}.</div>`;
+        setTimeout(() => window.location.href = '/app/facturas/index.html', 1500);
+      }
+    }
+
+    document.getElementById('factura-form').addEventListener('submit', e => { e.preventDefault(); guardar('emitida'); });
+    document.getElementById('btn-borrador').addEventListener('click', () => guardar('borrador'));
+  </script>
+</body>
+</html>

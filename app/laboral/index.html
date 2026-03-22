@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es" class="tema-claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboral — GestorAI.pro</title>
+  <meta name="theme-color" content="#0D7966">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img src="/assets/logo.svg" alt="GestorAI" class="sidebar-logo" width="32" height="32">
+        <span class="sidebar-brand">GestorAI</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/app/dashboard.html">📊 Dashboard</a>
+        <div class="nav-section">Gestión</div>
+        <a href="/app/facturas/index.html">🧾 Facturas</a>
+        <a href="/app/fiscal/index.html">📋 Fiscal</a>
+        <a href="/app/contratos/index.html">📝 Contratos</a>
+        <a href="/app/laboral/index.html" class="active">👥 Laboral</a>
+      </nav>
+    </aside>
+    <main class="app-main">
+      <div class="app-topbar">
+        <h1>👥 Módulo Laboral</h1>
+        <button class="btn btn-secondary" id="btn-tema" onclick="document.querySelector('[data-tema-toggle]')?.click()">🎨 Tema</button>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <p style="color:var(--color-text-muted);">Gestiona nóminas, calcula cotizaciones a la Seguridad Social y genera finiquitos. Todos los cálculos actualizados a 2025.</p>
+      </div>
+
+      <div class="grid-2col" style="gap:1.5rem; margin-bottom:2rem;">
+        <a href="/app/laboral/nomina.html" class="card" style="text-decoration:none; color:inherit; transition:transform 0.2s;">
+          <div style="font-size:2rem; margin-bottom:0.5rem;">💰</div>
+          <h2 style="font-size:1.1rem; margin-bottom:0.5rem;">Calculadora de Nóminas</h2>
+          <p style="font-size:0.9rem; color:var(--color-text-muted);">Calcula el salario bruto/neto, cotizaciones SS del trabajador y la empresa, y retención IRPF.</p>
+          <span class="badge" style="margin-top:0.5rem;">SS 2025</span>
+        </a>
+
+        <a href="/app/laboral/finiquito.html" class="card" style="text-decoration:none; color:inherit; transition:transform 0.2s;">
+          <div style="font-size:2rem; margin-bottom:0.5rem;">📋</div>
+          <h2 style="font-size:1.1rem; margin-bottom:0.5rem;">Calculadora de Finiquito</h2>
+          <p style="font-size:0.9rem; color:var(--color-text-muted);">Calcula vacaciones pendientes, parte proporcional de pagas extra y el finiquito total.</p>
+          <span class="badge" style="margin-top:0.5rem;">SMI 2025</span>
+        </a>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <h2 style="font-size:1.1rem; margin-bottom:1rem;">📊 Datos de referencia 2025</h2>
+        <table>
+          <thead>
+            <tr><th>Concepto</th><th style="text-align:right;">Valor</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>SMI mensual (14 pagas)</td><td style="text-align:right;">1.184 €</td></tr>
+            <tr><td>SMI anual</td><td style="text-align:right;">16.576 €</td></tr>
+            <tr><td>Base mín. cotización RG</td><td style="text-align:right;">1.184 €</td></tr>
+            <tr><td>Base máx. cotización RG</td><td style="text-align:right;">4.720,50 €</td></tr>
+            <tr><td>Cuota autónomo mínima</td><td style="text-align:right;">230 €/mes (aprox.)</td></tr>
+            <tr><td>IRPF mínimo exento</td><td style="text-align:right;">15.876 € (individual)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2 style="font-size:1.1rem; margin-bottom:1rem;">🔓 Funciones PRO</h2>
+        <ul style="list-style:none; padding:0;">
+          <li style="padding:0.5rem 0; border-bottom:1px solid var(--color-border);">✅ Cálculos ilimitados</li>
+          <li style="padding:0.5rem 0; border-bottom:1px solid var(--color-border);">✅ Exportar nóminas en PDF</li>
+          <li style="padding:0.5rem 0; border-bottom:1px solid var(--color-border);">✅ Consultas IA ilimitadas sobre laboral</li>
+          <li style="padding:0.5rem 0;">✅ Sin publicidad</li>
+        </ul>
+      </div>
+    </main>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Navegación móvil">
+    <a href="/app/dashboard.html"><span>📊</span>Inicio</a>
+    <a href="/app/facturas/index.html"><span>🧾</span>Facturas</a>
+    <a href="/app/fiscal/index.html"><span>📋</span>Fiscal</a>
+    <a href="/app/contratos/index.html"><span>📝</span>Contratos</a>
+    <a href="/app/laboral/index.html" class="active"><span>👥</span>Laboral</a>
+  </nav>
+
+  <script type="module">
+    import { initTema } from '/js/color-mode.js';
+    import { requireAuth } from '/js/auth.js';
+    initTema();
+    await requireAuth();
+  </script>
+</body>
+</html>

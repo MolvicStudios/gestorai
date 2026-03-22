@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es" class="tema-claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fiscal — GestorAI.pro</title>
+  <meta name="theme-color" content="#0D7966">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img src="/assets/logo.svg" alt="GestorAI" class="sidebar-logo" width="32" height="32">
+        <span class="sidebar-brand">GestorAI</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/app/dashboard.html">📊 Dashboard</a>
+        <div class="nav-section">Gestión</div>
+        <a href="/app/facturas/index.html">🧾 Facturas</a>
+        <a href="/app/fiscal/index.html" class="active">📋 Fiscal</a>
+        <a href="/app/contratos/index.html">📝 Contratos</a>
+        <a href="/app/laboral/index.html">👥 Laboral</a>
+      </nav>
+    </aside>
+    <main class="app-main">
+      <div class="app-topbar">
+        <h1>Módulo Fiscal</h1>
+      </div>
+      <p style="color:var(--color-text-muted); margin-bottom:2rem;">Calcula tus declaraciones trimestrales con ayuda de la IA. Normativa actualizada 2025–2026.</p>
+
+      <div class="grid-3">
+        <a href="/app/fiscal/modelo-130.html" class="card" style="text-decoration:none;">
+          <h3 style="color:var(--color-text);">Modelo 130</h3>
+          <p style="color:var(--color-text-muted); font-size:0.9rem;">IRPF — Estimación Directa. Pago fraccionado trimestral del 20% sobre rendimiento neto.</p>
+          <span class="badge badge-pro">Pro</span>
+        </a>
+        <a href="/app/fiscal/modelo-303.html" class="card" style="text-decoration:none;">
+          <h3 style="color:var(--color-text);">Modelo 303</h3>
+          <p style="color:var(--color-text-muted); font-size:0.9rem;">IVA trimestral. IVA repercutido − IVA soportado = resultado.</p>
+          <span class="badge badge-pro">Pro</span>
+        </a>
+        <a href="/app/fiscal/modelo-111.html" class="card" style="text-decoration:none;">
+          <h3 style="color:var(--color-text);">Modelo 111</h3>
+          <p style="color:var(--color-text-muted); font-size:0.9rem;">Retenciones IRPF a trabajadores y profesionales.</p>
+          <span class="badge badge-pro">Pro</span>
+        </a>
+      </div>
+
+      <div class="card mt-3">
+        <h3 style="margin-bottom:1rem;">📅 Calendario fiscal 2025–2026</h3>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr><th>Periodo</th><th>Modelos</th><th>Plazo</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1T (ene–mar)</td><td>130, 303, 111</td><td>Hasta 20 abril</td></tr>
+              <tr><td>2T (abr–jun)</td><td>130, 303, 111</td><td>Hasta 22 julio</td></tr>
+              <tr><td>3T (jul–sep)</td><td>130, 303, 111</td><td>Hasta 20 octubre</td></tr>
+              <tr><td>4T (oct–dic)</td><td>130, 303, 111</td><td>Hasta 30 enero</td></tr>
+              <tr><td>Resumen anual</td><td>390, 190</td><td>Hasta 30/31 enero</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script type="module">
+    import { initTema } from '/js/color-mode.js';
+    import { requireAuth } from '/js/auth.js';
+    initTema();
+    await requireAuth();
+  </script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es" class="tema-claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ver Factura — GestorAI.pro</title>
+  <meta name="theme-color" content="#0D7966">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img src="/assets/logo.svg" alt="GestorAI" class="sidebar-logo" width="32" height="32">
+        <span class="sidebar-brand">GestorAI</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/app/dashboard.html">📊 Dashboard</a>
+        <div class="nav-section">Gestión</div>
+        <a href="/app/facturas/index.html" class="active">🧾 Facturas</a>
+        <a href="/app/fiscal/index.html">📋 Fiscal</a>
+        <a href="/app/contratos/index.html">📝 Contratos</a>
+        <a href="/app/laboral/index.html">👥 Laboral</a>
+      </nav>
+    </aside>
+    <main class="app-main">
+      <div class="app-topbar">
+        <div>
+          <a href="/app/facturas/index.html" style="font-size:0.85rem; color:var(--color-text-muted);">← Volver a Facturas</a>
+          <h1 id="titulo-factura">Factura</h1>
+        </div>
+        <div style="display:flex; gap:0.5rem;">
+          <button class="btn btn-primary" id="btn-pdf">📄 Descargar PDF</button>
+          <button class="btn btn-secondary" id="btn-estado">Marcar como pagada</button>
+        </div>
+      </div>
+
+      <div id="factura-view" class="card">
+        <div class="spinner" style="margin:2rem auto;"></div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initTema } from '/js/color-mode.js';
+    import { requireAuth, getUserProfile, supabase } from '/js/auth.js';
+    import { generarFacturaPDF } from '/js/pdf-gen.js';
+    import { getLimitsForPlan } from '/js/plan-gate.js';
+
+    initTema();
+    const session = await requireAuth();
+    const profile = await getUserProfile();
+    const limits = getLimitsForPlan(profile?.plan || 'free');
+
+    const id = new URLSearchParams(window.location.search).get('id');
+    if (!id) { window.location.href = '/app/facturas/index.html'; throw new Error('No id'); }
+
+    const { data: factura, error } = await supabase.from('facturas').select('*').eq('id', id).single();
+    if (error || !factura) { window.location.href = '/app/facturas/index.html'; throw new Error('Not found'); }
+
+    const fmt = n => Number(n).toLocaleString('es-ES', { minimumFractionDigits: 2 });
+    document.getElementById('titulo-factura').textContent = `Factura ${factura.numero}`;
+
+    const lineas = factura.lineas || [];
+    document.getElementById('factura-view').innerHTML = `
+      <div id="factura-pdf-area" style="padding:1rem;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:2rem;">
+          <div>
+            <h2 style="color:var(--color-primary); margin-bottom:0.5rem;">FACTURA</h2>
+            <div style="font-size:0.9rem; color:var(--color-text-muted);">
+              <div>${profile?.empresa || profile?.nombre || ''}</div>
+              <div>NIF: ${profile?.nif || ''}</div>
+              <div>${profile?.direccion || ''}</div>
+              <div>${profile?.codigo_postal || ''} ${profile?.ciudad || ''}</div>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:1.25rem; font-weight:700;">${factura.numero}</div>
+            <div style="color:var(--color-text-muted);">Fecha: ${factura.fecha}</div>
+            ${factura.fecha_vencimiento ? `<div style="color:var(--color-text-muted);">Vencimiento: ${factura.fecha_vencimiento}</div>` : ''}
+          </div>
+        </div>
+        <div style="margin-bottom:1.5rem;">
+          <div style="font-size:0.8rem; text-transform:uppercase; color:var(--color-text-hint); margin-bottom:0.25rem;">Facturar a</div>
+          <div><strong>${factura.cliente_nombre}</strong></div>
+          <div style="color:var(--color-text-muted);">NIF: ${factura.cliente_nif || '—'}</div>
+          <div style="color:var(--color-text-muted);">${factura.cliente_direccion || ''}</div>
+        </div>
+        <table>
+          <thead><tr><th>Concepto</th><th style="text-align:right;">Uds.</th><th style="text-align:right;">Precio</th><th style="text-align:right;">Total</th></tr></thead>
+          <tbody>
+            ${lineas.map(l => `<tr><td>${l.concepto}</td><td style="text-align:right;">${l.cantidad}</td><td style="text-align:right;">${fmt(l.precio)} €</td><td style="text-align:right;">${fmt(l.cantidad * l.precio)} €</td></tr>`).join('')}
+          </tbody>
+        </table>
+        <div style="text-align:right; margin-top:1.5rem; font-family:var(--font-mono);">
+          <div>Base imponible: ${fmt(factura.base_imponible)} €</div>
+          <div>IVA (${factura.tipo_iva}%): ${fmt(factura.cuota_iva)} €</div>
+          ${factura.tipo_irpf > 0 ? `<div>IRPF (−${factura.tipo_irpf}%): −${fmt(factura.cuota_irpf)} €</div>` : ''}
+          <div style="font-size:1.25rem; font-weight:700; color:var(--color-primary); margin-top:0.5rem;">TOTAL: ${fmt(factura.total)} €</div>
+        </div>
+        ${factura.notas ? `<div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--color-border); font-size:0.9rem; color:var(--color-text-muted);">${factura.notas}</div>` : ''}
+      </div>
+    `;
+
+    // PDF
+    document.getElementById('btn-pdf').addEventListener('click', () => {
+      generarFacturaPDF({ factura, perfil: profile, marcaAgua: limits.pdf_marca_agua });
+    });
+
+    // Estado
+    if (factura.estado === 'pagada') {
+      document.getElementById('btn-estado').textContent = '✅ Pagada';
+      document.getElementById('btn-estado').disabled = true;
+    }
+    document.getElementById('btn-estado').addEventListener('click', async () => {
+      await supabase.from('facturas').update({ estado: 'pagada' }).eq('id', id);
+      document.getElementById('btn-estado').textContent = '✅ Pagada';
+      document.getElementById('btn-estado').disabled = true;
+    });
+  </script>
+</body>
+</html>

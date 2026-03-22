@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es" class="tema-claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facturas — GestorAI.pro</title>
+  <meta name="theme-color" content="#0D7966">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img src="/assets/logo.svg" alt="GestorAI" class="sidebar-logo" width="32" height="32">
+        <span class="sidebar-brand">GestorAI</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/app/dashboard.html">📊 Dashboard</a>
+        <div class="nav-section">Gestión</div>
+        <a href="/app/facturas/index.html" class="active">🧾 Facturas</a>
+        <a href="/app/fiscal/index.html">📋 Fiscal</a>
+        <a href="/app/contratos/index.html">📝 Contratos</a>
+        <a href="/app/laboral/index.html">👥 Laboral</a>
+      </nav>
+    </aside>
+    <main class="app-main">
+      <div class="app-topbar">
+        <h1>Facturas</h1>
+        <a href="/app/facturas/nueva.html" class="btn btn-primary">+ Nueva factura</a>
+      </div>
+
+      <div id="facturas-list">
+        <div class="empty-state">
+          <div class="empty-state-icon">🧾</div>
+          <div class="empty-state-title">No tienes facturas todavía</div>
+          <div class="empty-state-text">Emite tu primera factura profesional en segundos.</div>
+          <a href="/app/facturas/nueva.html" class="btn btn-primary">Crear primera factura</a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initTema } from '/js/color-mode.js';
+    import { requireAuth, supabase } from '/js/auth.js';
+
+    initTema();
+    const session = await requireAuth();
+    if (!session) throw new Error('No auth');
+
+    // Cargar facturas
+    const { data: facturas } = await supabase
+      .from('facturas')
+      .select('*')
+      .order('fecha', { ascending: false });
+
+    if (facturas && facturas.length > 0) {
+      const fmt = n => Number(n).toLocaleString('es-ES', { minimumFractionDigits: 2 });
+      const estados = { borrador: '📝', emitida: '📤', pagada: '✅', anulada: '❌' };
+      document.getElementById('facturas-list').innerHTML = `
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>Nº</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+              ${facturas.map(f => `
+                <tr>
+                  <td><strong>${f.numero}</strong></td>
+                  <td>${f.cliente_nombre}</td>
+                  <td>${f.fecha}</td>
+                  <td>${fmt(f.total)} €</td>
+                  <td>${estados[f.estado] || ''} ${f.estado}</td>
+                  <td><a href="/app/facturas/ver.html?id=${f.id}" class="btn btn-sm btn-secondary">Ver</a></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
