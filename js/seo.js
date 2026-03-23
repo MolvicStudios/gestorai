@@ -65,8 +65,8 @@ export function defaultSchema() {
     author: {
       '@type': 'Organization',
       name: 'MolvicStudios',
-      url: 'https://molvicstudios.com',
-      email: 'contacto@molvicstudios.com'
+      url: 'https://molvicstudios.pro',
+      email: 'molvicstudios@outlook.com'
     }
   };
 }
