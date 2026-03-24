@@ -256,6 +256,7 @@
         msgEl.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
       } else {
         msgEl.innerHTML = `<div class="alert alert-success">Factura ${estado === 'borrador' ? 'guardada como borrador' : 'emitida correctamente'}.</div>`;
+        window.molvicTrack && window.molvicTrack('invoice_created');
         setTimeout(() => window.location.href = '/app/facturas/index.html', 1500);
       }
     }
