@@ -7,6 +7,12 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Focus visible global */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 html {
   font-size: var(--font-size-base, 16px);
   scroll-behavior: smooth;
