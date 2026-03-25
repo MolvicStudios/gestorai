@@ -327,16 +327,42 @@
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
+    width: 85vw;
+    max-width: 300px;
   }
   .sidebar.open { transform: translateX(0); }
   .app-main { margin-left: 0; }
 
   .modal { padding: 1.5rem; }
+  .modal-close { min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
 
   .upgrade-banner {
     flex-direction: column;
     text-align: center;
   }
+
+  /* Touch targets 44px */
+  .btn-sm { min-height: 44px; padding: 10px 20px; }
+  .sidebar-nav a { padding: 12px 1.5rem; min-height: 44px; }
+  .faq-question { padding: 1.25rem 0.5rem; }
+  .ccaa-tag { padding: 0.5rem 1rem; min-height: 44px; display: inline-flex; align-items: center; }
+  .ccaa-btn { min-height: 44px; font-size: 0.875rem; }
+
+  /* Fonts legibles */
+  .stat-card-label { font-size: 0.875rem; }
+  .stat-card-hint { font-size: 0.875rem; }
+  .sidebar-nav .nav-section { font-size: 0.75rem; }
+  .sidebar-footer { font-size: 0.875rem; }
+  .zona-adsense { font-size: 0.875rem; }
+  .proof-label { font-size: 0.875rem; }
+  .ccaa-tag { font-size: 0.875rem; }
+  .badge { font-size: 0.8rem; }
+  .pricing-badge { font-size: 0.8rem; }
+  .footer-bottom { font-size: 0.875rem; }
+  th { font-size: 0.875rem; }
+  td, th { padding: 8px 10px; }
+  .toast { max-width: calc(100vw - 2rem); }
+  .tooltip-trigger::after { max-width: calc(100vw - 2rem); }
 }
 
 /* ─── Mobile bottom nav ─── */
@@ -361,11 +387,12 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  padding: 6px 12px;
-  font-size: 0.65rem;
+  padding: 8px 12px;
+  font-size: 0.75rem;
   color: var(--color-text-muted);
   text-decoration: none;
   font-weight: 500;
+  min-height: 44px;
 }
 .bottom-nav-item.active {
   color: var(--color-primary);

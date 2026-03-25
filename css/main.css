@@ -274,4 +274,22 @@ tr:hover { background: var(--color-surface-2); }
   h1 { font-size: 1.6rem; }
   .container { padding: 0 1rem; }
   .btn-lg { padding: 14px 24px; }
+  .footer a { padding: 8px 0; min-height: 44px; display: inline-flex; align-items: center; }
+}
+
+@media (max-width: 425px) {
+  .pricing-grid { grid-template-columns: 1fr; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .hero-ctas { flex-direction: column; width: 100%; }
+  .hero-ctas .btn { width: 100%; text-align: center; }
+  h1 { font-size: 1.5rem; }
+  .social-proof { gap: 1rem; flex-wrap: wrap; justify-content: center; }
+}
+
+@media (max-width: 375px) {
+  .container { padding: 0 0.75rem; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .ccaa-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .login-section { max-width: calc(100vw - 2rem); }
 }
