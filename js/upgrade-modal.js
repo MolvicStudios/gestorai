@@ -1,8 +1,8 @@
 // js/upgrade-modal.js — GestorAI Pro Upgrade Modal (Lemon Squeezy)
 import LicenseSystem from './license.js';
 
-const LS_CHECKOUT_MONTHLY = 'https://molvicstudios.lemonsqueezy.com/checkout/buy/1451042?test=true';
-const LS_CHECKOUT_ANNUAL  = 'https://molvicstudios.lemonsqueezy.com/checkout/buy/1451025?test=true';
+const LS_CHECKOUT_MONTHLY = 'https://molvicstudios.lemonsqueezy.com/checkout/buy/1451042';
+const LS_CHECKOUT_ANNUAL  = 'https://molvicstudios.lemonsqueezy.com/checkout/buy/1451025';
 
 const FEATURE_COPY = {
   facturas: {
