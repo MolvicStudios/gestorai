@@ -54,7 +54,7 @@
       <!-- Upgrade banner (plan Free) -->
       <div id="upgrade-banner" class="upgrade-banner" style="display:none;">
         <div class="upgrade-banner-text">
-          <strong>Mejora a Pro</strong> — Facturas ilimitadas, modelos fiscales, nóminas y más por solo 19,90 €/mes.
+          <strong>Mejora a Pro</strong> — Facturas ilimitadas, modelos fiscales, nóminas y más por solo 14,99 €/mes.
         </div>
         <button class="btn" id="btn-upgrade">Mejorar ahora</button>
       </div>
@@ -139,33 +139,15 @@
     </div>
   </nav>
 
-  <!-- Upgrade modal -->
-  <div class="modal-overlay" id="modal-upgrade">
-    <div class="modal">
-      <div class="modal-header">
-        <h2>Mejora a Pro</h2>
-        <button class="modal-close" onclick="document.getElementById('modal-upgrade').classList.remove('active');">&times;</button>
-      </div>
-      <p id="upgrade-reason">Desbloquea todas las funcionalidades de GestorAI.</p>
-      <p style="font-size:1.5rem; font-weight:700; color:var(--color-primary); margin:1rem 0;">19,90 €/mes</p>
-      <ul class="pricing-features" style="list-style:none; padding:0;">
-        <li>Facturas y contratos ilimitados</li>
-        <li>Consultas IA ilimitadas</li>
-        <li>Modelos fiscales (130, 303, 111)</li>
-        <li>Calculadora de nóminas</li>
-        <li>Historial completo</li>
-        <li>PDF sin marca de agua</li>
-      </ul>
-      <a href="https://josemole5.gumroad.com/l/gestorai-pro" target="_blank" rel="noopener" class="btn btn-primary btn-lg" style="width:100%; margin-top:1rem;">Probar Pro 7 días gratis</a>
-      <p style="text-align:center; font-size:0.8rem; color:var(--color-text-muted); margin-top:0.75rem;">7 días gratis. Cancela cuando quieras.</p>
-    </div>
-  </div>
+
 
   <script type="module">
     import { initTema, ciclarTema } from '/js/color-mode.js';
-    import { initAuth, initAppPage, getUser, isPro, supabase as sb } from '/js/auth.js';
+    import { initAuth, initAppPage, getUser, supabase as sb } from '/js/auth.js';
     import { initChatbot } from '/js/chatbot.js';
     import { initCookieBanner } from '/js/cookie-banner.js';
+    import LicenseSystem from '/js/license.js';
+    import { showUpgradeModal } from '/js/upgrade-modal.js';
     await initAuth();
     initChatbot();
 
@@ -178,18 +160,17 @@
     await initAppPage();
 
     // Cargar perfil
-    const pro = await isPro();
+    await LicenseSystem.refresh();
+    const pro = LicenseSystem.isPro();
     const plan = pro ? 'pro' : 'free';
     const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
 
-    if (plan === 'free') {
+    if (!pro) {
       document.getElementById('upgrade-banner').style.display = 'flex';
-      document.getElementById('adsense-zone').style.display = 'block';
     }
 
     // Stats
     if (profile) {
-      const subs = profile.subscriptions;
       document.getElementById('stat-facturado').textContent = `${Number(profile.facturado_anio || 0).toLocaleString('es-ES')} €`;
       document.getElementById('stat-facturas').textContent = profile.total_facturas || 0;
       const consultasHoy = profile.consultas_ia_hoy || 0;
@@ -207,7 +188,7 @@
 
     // Upgrade
     document.getElementById('btn-upgrade')?.addEventListener('click', () => {
-      document.getElementById('modal-upgrade').classList.add('active');
+      showUpgradeModal('facturas');
     });
 
 

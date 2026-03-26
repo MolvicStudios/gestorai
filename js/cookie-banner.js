@@ -21,8 +21,7 @@ export function initCookieBanner() {
       font-size: 0.9rem; color: var(--color-text);
     ">
       <p style="margin:0; flex:1; min-width:200px;">
-        Usamos cookies técnicas esenciales y Cloudflare Web Analytics (sin cookies de terceros).
-        El plan Free incluye publicidad de Google AdSense.
+        Usamos cookies técnicas esenciales y Cloudflare Analytics.
         <a href="/legal/cookies.html" style="color:var(--color-primary);">Política de cookies</a>.
       </p>
       <div style="display:flex; gap:0.5rem; flex-shrink:0;">

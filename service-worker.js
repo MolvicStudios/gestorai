@@ -7,7 +7,8 @@ const PRECACHE_URLS = [
   '/css/components.css',
   '/js/auth.js',
   '/js/color-mode.js',
-  '/js/plan-gate.js',
+  '/js/license.js',
+  '/js/upgrade-modal.js',
   '/js/cookie-banner.js',
   '/manifest.json',
 ];

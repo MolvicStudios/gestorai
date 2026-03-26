@@ -101,7 +101,8 @@
     import { initTema } from '/js/color-mode.js';
     import { initAuth, getUser, supabase as sb } from '/js/auth.js';
     import { initChatbot } from '/js/chatbot.js';
-    import { conAccesoPro } from '/js/plan-gate.js';
+    import LicenseSystem from '/js/license.js';
+    import { showUpgradeModal } from '/js/upgrade-modal.js';
     import { calcularModelo130 } from '/js/fiscal/calculos-irpf.js';
     import { askIA, PROMPTS } from '/js/ia-client.js';
 
@@ -111,8 +112,7 @@
     const user = await getUser();
     if (!user) { window.location.href = '/'; throw new Error('No auth'); }
     const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
-    const isProOk = await conAccesoPro('modelos', () => true);
-    if (!isProOk) throw new Error('Upgrade required');
+    if (!LicenseSystem.isPro()) { showUpgradeModal('modelos'); throw new Error('Upgrade required'); }
 
     window.irPaso = function(n) {
       document.querySelectorAll('.wizard-panel').forEach(p => p.classList.remove('active'));

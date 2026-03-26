@@ -47,9 +47,10 @@
 
   <script type="module">
     import { initTema } from '/js/color-mode.js';
-    import { initAuth, getUser, supabase, isPro } from '/js/auth.js';
+    import { initAuth, getUser, supabase } from '/js/auth.js';
     import { initChatbot } from '/js/chatbot.js';
     import { generarFacturaPDF, descargarPDF } from '/js/pdf-gen.js';
+    import LicenseSystem from '/js/license.js';
 
     initTema();
     await initAuth();
@@ -57,7 +58,7 @@
     const user = await getUser();
     if (!user) { window.location.href = '/'; throw new Error('No auth'); }
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-    const pro = await isPro();
+    const pro = LicenseSystem.isPro();
 
     const id = new URLSearchParams(window.location.search).get('id');
     if (!id) { window.location.href = '/app/facturas/index.html'; throw new Error('No id'); }

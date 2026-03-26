@@ -86,7 +86,8 @@
     import { initTema } from '/js/color-mode.js';
     import { initAuth, getUser, supabase } from '/js/auth.js';
     import { initChatbot } from '/js/chatbot.js';
-    import { conAccesoPro } from '/js/plan-gate.js';
+    import LicenseSystem from '/js/license.js';
+    import { showUpgradeModal } from '/js/upgrade-modal.js';
     import { calcularModelo303 } from '/js/fiscal/calculos-iva.js';
     import { askIA, PROMPTS } from '/js/ia-client.js';
 
@@ -96,7 +97,7 @@
     const user = await getUser();
     if (!user) { window.location.href = '/'; throw new Error('No auth'); }
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-    await conAccesoPro('modelos', () => true);
+    if (!LicenseSystem.isPro()) { showUpgradeModal('modelos'); throw new Error('Upgrade required'); }
 
     const fmt = n => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 

@@ -132,7 +132,8 @@ async function handleSend(e) {
   if (result.success) {
     addMessage('assistant', result.content);
   } else if (result.error === 'limite_free') {
-    addMessage('assistant', '⚠️ Has alcanzado el límite de 5 consultas diarias del plan gratuito. Para consultas ilimitadas, mejora a **Pro** por solo 19,90 €/mes con 7 días gratis.\n\n[Mejorar a Pro →](https://josemole5.gumroad.com/l/gestorai-pro)');
+    addMessage('assistant', '⚠️ Has alcanzado el límite de 5 consultas diarias del plan gratuito. Para consultas ilimitadas, mejora a **Pro** por solo 14,99 €/mes con 7 días gratis.');
+    import('./upgrade-modal.js').then(m => m.showUpgradeModal('ia'));
   } else if (result.error === 'no_session') {
     addMessage('assistant', '⚠️ Tu sesión ha expirado. Por favor, recarga la página e inicia sesión de nuevo.');
   } else {

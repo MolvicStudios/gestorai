@@ -47,16 +47,10 @@ export async function getUserProfile() {
   const sb = await initSupabase();
   const { data } = await sb
     .from('profiles')
-    .select('*, subscriptions(plan, status, current_period_end), onboarding(*)')
+    .select('*, onboarding(*)')
     .eq('id', user.id)
     .single();
-  if (data?.subscriptions?.[0]?.plan) data.plan = data.subscriptions[0].plan;
   return data;
-}
-
-export async function isPro() {
-  const p = await getUserProfile();
-  return p?.plan === 'pro';
 }
 
 export async function loginMagicLink(email) {
@@ -115,8 +109,10 @@ export async function initAppPage() {
   if (elNombre) elNombre.textContent = profile.nombre || profile.empresa || session.user.email.split('@')[0];
   if (elEmail)  elEmail.textContent  = session.user.email;
   if (elPlan) {
-    elPlan.textContent = profile.plan === 'pro' ? 'Pro' : 'Free';
-    elPlan.className   = `badge badge-${profile.plan === 'pro' ? 'pro' : 'free'}`;
+    const { default: LS } = await import('./license.js');
+    const isPro = LS.isPro();
+    elPlan.textContent = isPro ? 'Pro' : 'Free';
+    elPlan.className   = `badge badge-${isPro ? 'pro' : 'free'}`;
   }
   return { session, profile };
 }

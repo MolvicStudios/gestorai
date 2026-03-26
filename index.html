@@ -4,9 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GestorAI.pro — Gestoría IA para autónomos y pymes en España</title>
-  <meta name="description" content="Automatiza facturas, modelos fiscales 130/303/111, nóminas y contratos con inteligencia artificial. Adaptado a cada Comunidad Autónoma. Desde 0 €/mes.">
+  <meta name="description" content="Facturas, modelos fiscales 130/303/111, contratos y nóminas con IA. Adaptado a tu Comunidad Autónoma. Conforme a normativa española 2026.">
   <meta name="robots" content="index, follow">
-  <meta name="keywords" content="gestoría IA, facturación autónomos, modelo 303, modelo 130, nóminas automáticas, contratos IA, gestoría online España">
   <meta name="author" content="MolvicStudios">
   <meta name="theme-color" content="#0D7966">
   <link rel="canonical" href="https://gestorai.pro/">
@@ -15,16 +14,14 @@
 
   <!-- Open Graph -->
   <meta property="og:title" content="GestorAI.pro — Gestoría IA para autónomos y pymes">
-  <meta property="og:description" content="Automatiza facturas, modelos fiscales, nóminas y contratos con IA. Adaptado a cada Comunidad Autónoma.">
+  <meta property="og:description" content="Facturas, modelos fiscales, contratos y nóminas con IA. Adaptado a tu CCAA.">
   <meta property="og:url" content="https://gestorai.pro/">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://gestorai.pro/img/og-cover.png">
-  <meta property="og:site_name" content="GestorAI.pro">
   <meta property="og:locale" content="es_ES">
-  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="GestorAI.pro — Gestoría IA para autónomos y pymes">
-  <meta name="twitter:description" content="Automatiza facturas, modelos fiscales, nóminas y contratos con IA.">
+  <meta name="twitter:description" content="Facturas, modelos fiscales, contratos y nóminas con IA.">
   <meta name="twitter:image" content="https://gestorai.pro/img/og-cover.png">
 
   <!-- Schema.org -->
@@ -36,28 +33,26 @@
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
     "url": "https://gestorai.pro",
-    "description": "Gestoría virtual con inteligencia artificial para autónomos y pymes en España. Facturas, modelos fiscales, nóminas y contratos automatizados.",
-    "offers": [
-      { "@type": "Offer", "price": "0", "priceCurrency": "EUR", "description": "Plan Free" },
-      { "@type": "Offer", "price": "19.90", "priceCurrency": "EUR", "description": "Plan Pro — 7 días gratis" }
-    ],
+    "description": "Gestoría virtual con IA para autónomos y pymes en España.",
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": "0",
+      "highPrice": "14.99",
+      "priceCurrency": "EUR"
+    },
     "author": {
       "@type": "Organization",
       "name": "MolvicStudios",
-      "url": "https://molvicstudios.pro",
-      "email": "molvicstudios@outlook.com"
+      "url": "https://molvicstudios.pro"
     }
   }
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" href="/css/themes.css" as="style">
-  <link rel="preload" href="/css/main.css" as="style">
   <link rel="stylesheet" href="/css/themes.css">
   <link rel="stylesheet" href="/css/main.css">
   <style>
-    /* Landing-specific styles */
     .hero {
       text-align: center;
       padding: 5rem 1.5rem 4rem;
@@ -75,7 +70,16 @@
       max-width: 600px;
       margin: 0 auto 2rem;
     }
-    .hero-ctas { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .hero-badge {
+      display: inline-block;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 99px;
+      padding: 6px 16px;
+    }
     .section { padding: 4rem 0; }
     .section-title { text-align: center; margin-bottom: 0.5rem; }
     .section-subtitle {
@@ -86,29 +90,43 @@
     .feature-card { text-align: center; padding: 2rem 1.5rem; }
     .feature-icon { font-size: 2.5rem; margin-bottom: 1rem; }
     .feature-card h3 { margin-bottom: 0.5rem; }
-    .step-num {
-      width: 48px; height: 48px; border-radius: 50%;
-      background: var(--color-primary); color: var(--color-primary-text);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.25rem; font-weight: 700; margin: 0 auto 1rem;
-    }
-    /* Social proof */
-    .social-proof { display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap; padding: 2rem 0; }
-    .proof-item { text-align: center; }
-    .proof-num { font-size: 2rem; font-weight: 800; color: var(--color-primary); display: block; }
-    .proof-label { font-size: 0.85rem; color: var(--color-text-muted); }
-    /* CCAA teaser */
-    .ccaa-teaser {
-      display: flex; flex-wrap: wrap; gap: 0.5rem;
-      justify-content: center; max-width: 600px; margin: 0 auto;
+    /* CCAA */
+    .ccaa-scroll {
+      display: flex; gap: 0.5rem; overflow-x: auto;
+      padding: 0.5rem 0; -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
     }
     .ccaa-tag {
       background: var(--color-surface); border: 1px solid var(--color-border);
       border-radius: 99px; padding: 0.35rem 0.85rem;
-      font-size: 0.8rem; font-weight: 500;
+      font-size: 0.8rem; font-weight: 500; white-space: nowrap; flex-shrink: 0;
+    }
+    .ccaa-tag.highlight {
+      border-color: var(--color-primary); background: var(--color-primary-light);
+      font-weight: 600;
     }
     /* Pricing */
-    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 720px; margin: 0 auto; }
+    .pricing-toggle {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.75rem; margin-bottom: 2rem; font-size: 0.95rem;
+    }
+    .pricing-toggle label { cursor: pointer; color: var(--color-text-muted); }
+    .toggle-switch {
+      position: relative; width: 48px; height: 26px;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0; background: var(--color-border);
+      border-radius: 26px; cursor: pointer; transition: background .3s;
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute; left: 3px; top: 3px;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #fff; transition: transform .3s;
+    }
+    .toggle-switch input:checked + .toggle-slider { background: var(--color-primary); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(22px); }
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 720px; margin: 0 auto; }
     .pricing-card { border-radius: var(--radius-lg); padding: 2rem; text-align: center; }
     .pricing-card.featured { border: 2px solid var(--color-primary); position: relative; }
     .pricing-badge {
@@ -123,11 +141,6 @@
     .pricing-features li::before { content: '✓'; color: var(--color-success); font-weight: 700; }
     .pricing-features li.disabled { opacity: 0.4; }
     .pricing-features li.disabled::before { content: '✕'; color: var(--color-danger); }
-    /* Legal banner */
-    .legal-banner {
-      background: var(--color-primary-light); border: 1px solid var(--color-primary);
-      border-radius: var(--radius-lg); padding: 1.5rem 2rem; text-align: center; margin: 2rem 0;
-    }
     /* FAQ */
     .faq-item { border-bottom: 1px solid var(--color-border); }
     .faq-question {
@@ -152,16 +165,6 @@
     .footer a { color: var(--color-text-muted); text-decoration: none; display: block; padding: 3px 0; }
     .footer a:hover { color: var(--color-primary); }
     .footer-bottom { text-align: center; padding-top: 1.5rem; border-top: 1px solid var(--color-border); font-size: 0.8rem; }
-    /* Login */
-    .login-section {
-      background: var(--color-surface); border: 1px solid var(--color-border);
-      border-radius: var(--radius-lg); padding: 2rem; max-width: 420px;
-      margin: 0 auto; display: none;
-    }
-    .login-section.active { display: block; }
-    .login-section h2 { text-align: center; margin-bottom: 1.5rem; }
-    .form-group { margin-bottom: 1rem; }
-    .form-group label { display: block; margin-bottom: 0.25rem; }
 
     @media (max-width: 640px) {
       .hero h1 { font-size: 1.8rem; }
@@ -178,15 +181,16 @@
       <a href="/" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
         <img src="/assets/logo.svg" alt="GestorAI" width="32" height="32">
         <span style="font-weight:700; font-size:1.1rem; color:var(--color-primary);">GestorAI<span style="color:var(--color-text-muted); font-weight:400;">.pro</span></span>
-        <span style="display:block;font-size:11px;font-weight:400;opacity:0.6;letter-spacing:0.03em;line-height:1;">by MolvicStudios.pro</span>
       </a>
       <nav style="display:flex; align-items:center; gap:1rem;">
         <a href="#modulos" style="color:var(--color-text-muted); text-decoration:none; font-size:.9rem;">Módulos</a>
         <a href="#planes" style="color:var(--color-text-muted); text-decoration:none; font-size:.9rem;">Planes</a>
+        <a href="#faq" style="color:var(--color-text-muted); text-decoration:none; font-size:.9rem;">FAQ</a>
         <button id="btn-tema" aria-label="Cambiar tema" style="background:none; border:1px solid var(--color-border); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:1.1rem; color:var(--color-text);">
           <span data-tema-icon>☀️</span>
         </button>
-        <a href="#login" class="btn btn-primary btn-sm" id="cta-header">Empezar gratis</a>
+        <a href="/app/dashboard.html" class="btn btn-secondary btn-sm">Acceder</a>
+        <a href="https://molvicstudios.lemonsqueezy.com/checkout/buy/1451042?test=true" target="_blank" rel="noopener" class="btn btn-primary btn-sm">Probar gratis</a>
       </nav>
     </div>
   </header>
@@ -194,31 +198,16 @@
   <!-- Hero -->
   <main>
   <section class="hero" id="hero-section">
-    <h1>Tu gestoría virtual 24/7 impulsada por inteligencia artificial</h1>
-    <p class="subtitle">Facturas, modelos fiscales 130/303/111, contratos y nóminas. Adaptado a tu Comunidad Autónoma. Conforme a la normativa española 2025.</p>
-    <div class="hero-ctas">
-      <a href="#login" class="btn btn-primary btn-lg">Empezar gratis</a>
-      <a href="#como-funciona" class="btn btn-ghost btn-lg">Cómo funciona</a>
-    </div>
-  </section>
-
-  <!-- Social proof -->
-  <section style="background:var(--color-surface); padding:1.5rem 0;">
-    <div class="container">
-      <div class="social-proof">
-        <div class="proof-item"><span class="proof-num">17</span><span class="proof-label">CC.AA. soportadas</span></div>
-        <div class="proof-item"><span class="proof-num">IA</span><span class="proof-label">Groq + Mistral</span></div>
-        <div class="proof-item"><span class="proof-num">0 €</span><span class="proof-label">Para empezar</span></div>
-        <div class="proof-item"><span class="proof-num">24/7</span><span class="proof-label">Disponible siempre</span></div>
-      </div>
-    </div>
+    <h1>Tu gestoría virtual con IA para autónomos y pymes</h1>
+    <p class="subtitle">Facturas, modelos fiscales, contratos y nóminas. Adaptado a tu Comunidad Autónoma. Normativa española 2026.</p>
+    <a href="https://molvicstudios.lemonsqueezy.com/checkout/buy/1451042?test=true" target="_blank" rel="noopener" class="btn btn-primary btn-lg">🚀 Probar 7 días gratis</a>
+    <div class="hero-badge">Sin tarjeta · Cancela cuando quieras</div>
   </section>
 
   <!-- Módulos -->
   <section class="section" id="modulos">
     <div class="container">
       <h2 class="section-title">Todo lo que necesita tu negocio</h2>
-      <p class="section-subtitle">6 módulos profesionales alimentados por IA para gestionar tu actividad al completo.</p>
       <div class="grid-3">
         <div class="card feature-card">
           <div class="feature-icon">🧾</div>
@@ -254,65 +243,46 @@
     </div>
   </section>
 
-  <!-- CCAA teaser -->
+  <!-- CCAA -->
   <section class="section" style="background:var(--color-surface);">
     <div class="container" style="text-align:center;">
-      <h2 class="section-title">Adaptado a cada Comunidad Autónoma</h2>
-      <p class="section-subtitle">IGIC en Canarias, TicketBAI en País Vasco y Navarra, IPSI en Ceuta y Melilla. GestorAI se adapta automáticamente a tu régimen fiscal.</p>
-      <div class="ccaa-teaser">
-        <span class="ccaa-tag">🟢 Andalucía</span>
-        <span class="ccaa-tag">🟠 Aragón</span>
-        <span class="ccaa-tag">🔵 Asturias</span>
-        <span class="ccaa-tag">🟡 Baleares</span>
-        <span class="ccaa-tag">🟣 Canarias · IGIC</span>
-        <span class="ccaa-tag">🔴 Cantabria</span>
-        <span class="ccaa-tag">🟤 Castilla y León</span>
-        <span class="ccaa-tag">🟠 Castilla-La Mancha</span>
-        <span class="ccaa-tag">🔴 Cataluña</span>
-        <span class="ccaa-tag">⚫ Ceuta · IPSI</span>
-        <span class="ccaa-tag">🟢 Extremadura</span>
-        <span class="ccaa-tag">🔵 Galicia</span>
-        <span class="ccaa-tag">🔴 Madrid</span>
-        <span class="ccaa-tag">⚫ Melilla · IPSI</span>
-        <span class="ccaa-tag">🟣 Murcia</span>
-        <span class="ccaa-tag">🔴 Navarra · TicketBAI</span>
-        <span class="ccaa-tag">🟢 País Vasco · TicketBAI</span>
-        <span class="ccaa-tag">🔴 La Rioja</span>
-        <span class="ccaa-tag">🟠 C. Valenciana</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Cómo funciona -->
-  <section class="section" id="como-funciona">
-    <div class="container">
-      <h2 class="section-title">Cómo funciona</h2>
-      <p class="section-subtitle">En 3 simples pasos empieza a gestionar tu negocio con IA.</p>
-      <div class="grid-3">
-        <div style="text-align:center; padding:1.5rem;">
-          <div class="step-num">1</div>
-          <h3 style="margin-bottom:0.5rem;">Regístrate gratis</h3>
-          <p style="color:var(--color-text-muted);">Solo necesitas un email. 0 € para empezar con el plan Free.</p>
-        </div>
-        <div style="text-align:center; padding:1.5rem;">
-          <div class="step-num">2</div>
-          <h3 style="margin-bottom:0.5rem;">Completa tu perfil</h3>
-          <p style="color:var(--color-text-muted);">Introduce tus datos fiscales y selecciona tu Comunidad Autónoma.</p>
-        </div>
-        <div style="text-align:center; padding:1.5rem;">
-          <div class="step-num">3</div>
-          <h3 style="margin-bottom:0.5rem;">Gestiona todo con IA</h3>
-          <p style="color:var(--color-text-muted);">Facturas, impuestos, contratos y nóminas. La IA hace el trabajo pesado.</p>
-        </div>
+      <h2 class="section-title">Adaptado a las 17 CC.AA.</h2>
+      <div class="ccaa-scroll" style="justify-content:center; flex-wrap:wrap;">
+        <span class="ccaa-tag">Andalucía</span>
+        <span class="ccaa-tag">Aragón</span>
+        <span class="ccaa-tag">Asturias</span>
+        <span class="ccaa-tag">Baleares</span>
+        <span class="ccaa-tag highlight">Canarias · IGIC</span>
+        <span class="ccaa-tag">Cantabria</span>
+        <span class="ccaa-tag">Castilla y León</span>
+        <span class="ccaa-tag">Castilla-La Mancha</span>
+        <span class="ccaa-tag">Cataluña</span>
+        <span class="ccaa-tag">Ceuta · IPSI</span>
+        <span class="ccaa-tag">Extremadura</span>
+        <span class="ccaa-tag">Galicia</span>
+        <span class="ccaa-tag">Madrid</span>
+        <span class="ccaa-tag">Melilla · IPSI</span>
+        <span class="ccaa-tag">Murcia</span>
+        <span class="ccaa-tag highlight">Navarra · TicketBAI</span>
+        <span class="ccaa-tag highlight">País Vasco · TicketBAI</span>
+        <span class="ccaa-tag">La Rioja</span>
+        <span class="ccaa-tag">C. Valenciana</span>
       </div>
     </div>
   </section>
 
   <!-- Planes -->
-  <section class="section" id="planes" style="background:var(--color-surface);">
+  <section class="section" id="planes">
     <div class="container">
       <h2 class="section-title">Planes</h2>
-      <p class="section-subtitle">Empieza gratis y mejora cuando quieras. 7 días de prueba en el plan Pro.</p>
+      <div class="pricing-toggle">
+        <label for="toggle-anual">Mensual</label>
+        <div class="toggle-switch">
+          <input type="checkbox" id="toggle-anual">
+          <span class="toggle-slider"></span>
+        </div>
+        <label for="toggle-anual">Anual</label>
+      </div>
       <div class="pricing-grid">
         <!-- Free -->
         <div class="card pricing-card">
@@ -327,14 +297,14 @@
             <li class="disabled">Sin calculadora nóminas</li>
             <li class="disabled">PDF con marca de agua</li>
           </ul>
-          <a href="#login" class="btn btn-secondary" style="width:100%;">Empezar gratis</a>
+          <a href="/app/dashboard.html" class="btn btn-secondary" style="width:100%;">Usar gratis</a>
         </div>
         <!-- Pro -->
         <div class="card pricing-card featured">
           <span class="pricing-badge">7 días gratis</span>
           <h3>Pro</h3>
-          <div class="pricing-price" style="color:var(--color-primary);">19,90 €</div>
-          <div class="pricing-period">/ mes (IVA incluido)</div>
+          <div class="pricing-price" id="precio-pro" style="color:var(--color-primary);">14,99€</div>
+          <div class="pricing-period" id="periodo-pro">/ mes (IVA inc.)</div>
           <ul class="pricing-features">
             <li>Facturas ilimitadas</li>
             <li>Contratos ilimitados</li>
@@ -344,19 +314,8 @@
             <li>PDF sin marca de agua</li>
             <li>Gestión de clientes</li>
           </ul>
-          <a href="https://josemole5.gumroad.com/l/gestorai-pro" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%;">Probar Pro 7 días gratis</a>
+          <a href="https://molvicstudios.lemonsqueezy.com/checkout/buy/1451042?test=true" target="_blank" rel="noopener" id="btn-checkout-pro" class="btn btn-primary" style="width:100%;">Empezar 7 días gratis</a>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Legal banner -->
-  <section class="section" style="padding:2rem 0;">
-    <div class="container">
-      <div class="legal-banner">
-        <p style="margin:0; font-weight:600; font-size:1.05rem;">
-          🔒 Preparado para VERIFACTU 2027 · Conforme RGPD/LOPDGDD · Normativa fiscal 2025–2026 · Adaptado a 17 CC.AA.
-        </p>
       </div>
     </div>
   </section>
@@ -365,11 +324,10 @@
   <section class="section" id="faq">
     <div class="container container-sm">
       <h2 class="section-title">Preguntas frecuentes</h2>
-      <p class="section-subtitle">Resolvemos tus dudas más comunes.</p>
 
       <div class="faq-item">
-        <button class="faq-question" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');this.nextElementSibling.classList.toggle('open');">
-          ¿GestorAI sustituye a un gestor profesional?
+        <button class="faq-question" aria-expanded="false">
+          ¿Sustituye a un gestor profesional?
         </button>
         <div class="faq-answer">
           <p>No. GestorAI es una herramienta de asistencia que automatiza cálculos y genera documentos orientativos. Siempre recomendamos revisar los resultados con un gestor colegiado antes de presentar declaraciones oficiales.</p>
@@ -377,87 +335,29 @@
       </div>
 
       <div class="faq-item">
-        <button class="faq-question" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');this.nextElementSibling.classList.toggle('open');">
-          ¿Necesito instalar algo o dar mi clave API?
+        <button class="faq-question" aria-expanded="false">
+          ¿Necesito instalar algo?
         </button>
         <div class="faq-answer">
-          <p>No. GestorAI funciona directamente en el navegador sin instalar nada. La IA se ejecuta en nuestros servidores de forma segura — no necesitas ninguna clave API.</p>
+          <p>No. GestorAI funciona directamente en el navegador sin instalar nada. La IA se ejecuta en nuestros servidores de forma segura — no necesitas ninguna clave API ni software adicional.</p>
         </div>
       </div>
 
       <div class="faq-item">
-        <button class="faq-question" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');this.nextElementSibling.classList.toggle('open');">
-          ¿Mis datos están seguros?
+        <button class="faq-question" aria-expanded="false">
+          ¿Puedo cancelar el plan Pro?
         </button>
         <div class="faq-answer">
-          <p>Sí. Usamos Supabase (PostgreSQL) con Row Level Security, lo que significa que cada usuario solo puede ver y modificar sus propios datos. Las comunicaciones van cifradas con TLS.</p>
+          <p>Sí. Puedes cancelar en cualquier momento desde tu panel de Lemon Squeezy. Tu plan será efectivo hasta el final del periodo ya pagado. Incluye 7 días de prueba gratuita. Sin permanencia ni penalización.</p>
         </div>
       </div>
 
       <div class="faq-item">
-        <button class="faq-question" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');this.nextElementSibling.classList.toggle('open');">
-          ¿Puedo cancelar el plan Pro en cualquier momento?
-        </button>
-        <div class="faq-answer">
-          <p>Sí. Puedes cancelar desde Gumroad. Tu plan será efectivo hasta el final del periodo ya pagado. Incluye 7 días de prueba gratuita. No hay permanencia ni penalización.</p>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-question" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');this.nextElementSibling.classList.toggle('open');">
-          ¿Las facturas generadas tienen validez legal?
-        </button>
-        <div class="faq-answer">
-          <p>Las facturas cumplen los requisitos del RD 1619/2012 y están preparadas para la normativa VERIFACTU. Es responsabilidad del emisor verificar la corrección de los datos fiscales.</p>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-question" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');this.nextElementSibling.classList.toggle('open');">
+        <button class="faq-question" aria-expanded="false">
           ¿Se adapta a mi Comunidad Autónoma?
         </button>
         <div class="faq-answer">
           <p>Sí. GestorAI soporta las 17 CC.AA. con sus regímenes especiales: IGIC en Canarias, TicketBAI en País Vasco y Navarra, IPSI en Ceuta y Melilla, y más.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Login/Registro -->
-  <section class="section" id="login">
-    <div class="container">
-      <div class="login-section active">
-        <h2>Accede a GestorAI</h2>
-        <div id="login-form">
-          <div class="form-group">
-            <label for="login-email">Email</label>
-            <input type="email" id="login-email" placeholder="tu@email.com" required autocomplete="email">
-          </div>
-          <div class="form-group">
-            <label for="login-password">Contraseña</label>
-            <input type="password" id="login-password" placeholder="Tu contraseña" required autocomplete="current-password">
-          </div>
-          <button class="btn btn-primary btn-lg" style="width:100%; margin-top:0.5rem;" id="btn-login">Iniciar sesión</button>
-          <p style="text-align:center; margin-top:1rem; font-size:0.9rem; color:var(--color-text-muted);">
-            ¿No tienes cuenta? <a href="#" id="show-register">Regístrate gratis</a>
-          </p>
-          <div id="login-msg" style="margin-top:1rem;"></div>
-        </div>
-
-        <div id="register-form" style="display:none;">
-          <div class="form-group">
-            <label for="reg-email">Email</label>
-            <input type="email" id="reg-email" placeholder="tu@email.com" required autocomplete="email">
-          </div>
-          <div class="form-group">
-            <label for="reg-password">Contraseña</label>
-            <input type="password" id="reg-password" placeholder="Mínimo 8 caracteres" required minlength="8" autocomplete="new-password">
-          </div>
-          <button class="btn btn-primary btn-lg" style="width:100%; margin-top:0.5rem;" id="btn-register">Crear cuenta gratis</button>
-          <p style="text-align:center; margin-top:1rem; font-size:0.9rem; color:var(--color-text-muted);">
-            ¿Ya tienes cuenta? <a href="#" id="show-login">Iniciar sesión</a>
-          </p>
-          <div id="register-msg" style="margin-top:1rem;"></div>
         </div>
       </div>
     </div>
@@ -476,7 +376,6 @@
         <div>
           <div class="footer-title">Producto</div>
           <a href="#modulos">Módulos</a>
-          <a href="#como-funciona">Cómo funciona</a>
           <a href="#planes">Planes</a>
           <a href="#faq">FAQ</a>
         </div>
@@ -485,7 +384,6 @@
           <a href="/legal/aviso-legal.html">Aviso legal</a>
           <a href="/legal/privacidad.html">Política de privacidad</a>
           <a href="/legal/cookies.html">Política de cookies</a>
-          <a href="/legal/terminos.html">Términos del servicio</a>
         </div>
         <div>
           <div class="footer-title">Contacto</div>
@@ -493,11 +391,68 @@
           <a href="https://wa.me/34600055882" target="_blank" rel="noopener">WhatsApp: +34 600 055 882</a>
         </div>
       </div>
+      <p style="text-align:center; font-size:0.8rem; margin-bottom:1.5rem; color:var(--color-text-muted);">
+        🔒 VERIFACTU 2027 · RGPD/LOPDGDD · Normativa 2025-2026 · 17 CC.AA.
+      </p>
+      <p style="text-align:center; font-size:0.75rem; color:var(--color-text-muted);">
+        Gestiona tu suscripción en <a href="https://app.lemonsqueezy.com" target="_blank" rel="noopener" style="color:var(--color-primary);">lemonsqueezy.com</a>
+      </p>
       <div class="footer-bottom">
         <p>© 2026 <a href="https://molvicstudios.pro" target="_blank" rel="noopener" style="color:inherit;">MolvicStudios.pro</a>. Todos los derechos reservados. · <a href="mailto:molvicstudios@outlook.com" style="color:inherit;">molvicstudios@outlook.com</a></p>
         <p>Esta plataforma es una herramienta de asistencia. No sustituye al asesoramiento de un gestor colegiado.</p>
       </div>
     </div>
+  </footer>
+
+  <script type="module">
+    import { initTema, ciclarTema } from '/js/color-mode.js';
+    import { initCookieBanner } from '/js/cookie-banner.js';
+
+    initTema();
+    initCookieBanner();
+
+    // Toggle tema
+    document.getElementById('btn-tema')
+      .addEventListener('click', ciclarTema);
+
+    // Toggle precios mensual/anual
+    const toggleAnual = document.getElementById('toggle-anual');
+    if (toggleAnual) {
+      toggleAnual.addEventListener('change', () => {
+        const isAnual = toggleAnual.checked;
+        document.getElementById('precio-pro').textContent =
+          isAnual ? '149€' : '14,99€';
+        document.getElementById('periodo-pro').textContent =
+          isAnual ? '/ año (IVA inc.)' : '/ mes (IVA inc.)';
+        document.getElementById('btn-checkout-pro').href =
+          isAnual
+            ? 'https://molvicstudios.lemonsqueezy.com/checkout/buy/1451025?test=true'
+            : 'https://molvicstudios.lemonsqueezy.com/checkout/buy/1451042?test=true';
+      });
+    }
+
+    // FAQ accordion
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', !expanded);
+        btn.nextElementSibling.classList.toggle('open', !expanded);
+      });
+    });
+  </script>
+
+  <!-- Cloudflare Web Analytics -->
+  <!-- <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": ""}'></script> -->
+
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js');
+    }
+  </script>
+  <script src="/analytics.js" defer></script>
+</body>
+</html>
   </footer>
 
   <script type="module">

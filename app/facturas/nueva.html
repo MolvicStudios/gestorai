@@ -147,9 +147,10 @@
 
   <script type="module">
     import { initTema } from '/js/color-mode.js';
-    import { initAuth, getUser, supabase, isPro } from '/js/auth.js';
+    import { initAuth, getUser, supabase } from '/js/auth.js';
     import { initChatbot } from '/js/chatbot.js';
-    import { verificarLimiteFactura } from '/js/plan-gate.js';
+    import LicenseSystem from '/js/license.js';
+    import { showUpgradeModal } from '/js/upgrade-modal.js';
 
     initTema();
     await initAuth();
@@ -246,8 +247,7 @@
     // Save
     async function guardar(estado) {
       // Check plan limits
-      const ok = await verificarLimiteFactura();
-      if (!ok) return;
+      if (!LicenseSystem.canDo('facturas')) { showUpgradeModal('facturas'); return; }
 
       const factura = buildFactura(estado);
       const { error } = await supabase.from('facturas').insert(factura);
@@ -255,6 +255,7 @@
       if (error) {
         msgEl.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
       } else {
+        LicenseSystem.consume('facturas');
         msgEl.innerHTML = `<div class="alert alert-success">Factura ${estado === 'borrador' ? 'guardada como borrador' : 'emitida correctamente'}.</div>`;
         window.molvicTrack && window.molvicTrack('invoice_created');
         setTimeout(() => window.location.href = '/app/facturas/index.html', 1500);
