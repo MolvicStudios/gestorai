@@ -189,7 +189,7 @@
         <button id="btn-tema" aria-label="Cambiar tema" style="background:none; border:1px solid var(--color-border); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:1.1rem; color:var(--color-text);">
           <span data-tema-icon>☀️</span>
         </button>
-        <a href="/app/dashboard.html" class="btn btn-secondary btn-sm">Acceder</a>
+        <a href="#login" class="btn btn-secondary btn-sm">Acceder</a>
         <a href="https://molvicstudios.lemonsqueezy.com/checkout/buy/1451042?test=true" target="_blank" rel="noopener" class="btn btn-primary btn-sm">Probar gratis</a>
       </nav>
     </div>
@@ -297,7 +297,7 @@
             <li class="disabled">Sin calculadora nóminas</li>
             <li class="disabled">PDF con marca de agua</li>
           </ul>
-          <a href="/app/dashboard.html" class="btn btn-secondary" style="width:100%;">Usar gratis</a>
+          <a href="#login" class="btn btn-secondary" style="width:100%;">Usar gratis</a>
         </div>
         <!-- Pro -->
         <div class="card pricing-card featured">
@@ -362,6 +362,45 @@
       </div>
     </div>
   </section>
+
+  <!-- Login/Registro -->
+  <section class="section" id="login" style="display:none;">
+    <div class="container">
+      <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:2rem;max-width:420px;margin:0 auto;">
+        <h2 style="text-align:center;margin-bottom:1.5rem;">Accede a GestorAI</h2>
+        <div id="login-form">
+          <div style="margin-bottom:1rem;">
+            <label for="login-email" style="display:block;margin-bottom:0.25rem;">Email</label>
+            <input type="email" id="login-email" placeholder="tu@email.com" required autocomplete="email" class="form-control">
+          </div>
+          <div style="margin-bottom:1rem;">
+            <label for="login-password" style="display:block;margin-bottom:0.25rem;">Contraseña</label>
+            <input type="password" id="login-password" placeholder="Tu contraseña" required autocomplete="current-password" class="form-control">
+          </div>
+          <button class="btn btn-primary btn-lg" style="width:100%;margin-top:0.5rem;" id="btn-login">Iniciar sesión</button>
+          <p style="text-align:center;margin-top:1rem;font-size:0.9rem;color:var(--color-text-muted);">
+            ¿No tienes cuenta? <a href="#" id="show-register">Regístrate gratis</a>
+          </p>
+          <div id="login-msg" style="margin-top:1rem;"></div>
+        </div>
+        <div id="register-form" style="display:none;">
+          <div style="margin-bottom:1rem;">
+            <label for="reg-email" style="display:block;margin-bottom:0.25rem;">Email</label>
+            <input type="email" id="reg-email" placeholder="tu@email.com" required autocomplete="email" class="form-control">
+          </div>
+          <div style="margin-bottom:1rem;">
+            <label for="reg-password" style="display:block;margin-bottom:0.25rem;">Contraseña</label>
+            <input type="password" id="reg-password" placeholder="Mínimo 8 caracteres" required minlength="8" autocomplete="new-password" class="form-control">
+          </div>
+          <button class="btn btn-primary btn-lg" style="width:100%;margin-top:0.5rem;" id="btn-register">Crear cuenta gratis</button>
+          <p style="text-align:center;margin-top:1rem;font-size:0.9rem;color:var(--color-text-muted);">
+            ¿Ya tienes cuenta? <a href="#" id="show-login">Iniciar sesión</a>
+          </p>
+          <div id="register-msg" style="margin-top:1rem;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
   </main>
 
   <!-- Footer -->
@@ -406,10 +445,27 @@
 
   <script type="module">
     import { initTema, ciclarTema } from '/js/color-mode.js';
+    import { loginPassword, registerPassword, getSession } from '/js/auth.js';
     import { initCookieBanner } from '/js/cookie-banner.js';
 
     initTema();
     initCookieBanner();
+
+    // If already authenticated, redirect to app
+    getSession().then(session => {
+      if (session) window.location.href = '/app/dashboard.html';
+    });
+
+    // Show login section on hash or param
+    function checkShowLogin() {
+      const loginSection = document.getElementById('login');
+      if (location.hash === '#login' || new URLSearchParams(location.search).has('login')) {
+        loginSection.style.display = 'block';
+        loginSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+    checkShowLogin();
+    window.addEventListener('hashchange', checkShowLogin);
 
     // Toggle tema
     document.getElementById('btn-tema')
@@ -439,39 +495,8 @@
         btn.nextElementSibling.classList.toggle('open', !expanded);
       });
     });
-  </script>
 
-  <!-- Cloudflare Web Analytics -->
-  <!-- <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": ""}'></script> -->
-
-  <!-- Service Worker -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js');
-    }
-  </script>
-  <script src="/analytics.js" defer></script>
-</body>
-</html>
-  </footer>
-
-  <script type="module">
-    import { initTema, ciclarTema } from '/js/color-mode.js';
-    import { loginPassword, registerPassword, getSession } from '/js/auth.js';
-    import { initCookieBanner } from '/js/cookie-banner.js';
-
-    initTema();
-    initCookieBanner();
-
-    // If already authenticated, redirect to app
-    getSession().then(session => {
-      if (session) window.location.href = '/app/dashboard.html';
-    });
-
-    // Theme toggle
-    document.getElementById('btn-tema').addEventListener('click', ciclarTema);
-
-    // Toggle login/register
+    // Login/Register toggle
     document.getElementById('show-register').addEventListener('click', e => {
       e.preventDefault();
       document.getElementById('login-form').style.display = 'none';
@@ -516,7 +541,6 @@
       navigator.serviceWorker.register('/service-worker.js');
     }
   </script>
-<!-- MolvicStudios Analytics -->
-<script src="/analytics.js" defer></script>
+  <script src="/analytics.js" defer></script>
 </body>
 </html>
