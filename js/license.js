@@ -1,27 +1,21 @@
 // js/license.js — GestorAI License System (Lemon Squeezy)
-// Replaces all Supabase plan/subscription logic
 
-const KEYS = {
-  license_key:  'gestorai_pro_license_key',
-  plan:         'gestorai_pro_plan',
-  status:       'gestorai_pro_status',
-  verified_at:  'gestorai_pro_verified_at',
-  expires:      'gestorai_pro_expires'
-};
+// ── Constantes ────────────────────────────────────────────────────────────────
+const LS_PLAN_KEY    = 'gestorai_plan';
+const LS_LICENSE_KEY = 'gestorai_license_key';
+const LS_BILLING_KEY = 'gestorai_billing_period';
+const LS_LAST_CHECK  = 'gestorai_last_check';
+const VALIDATE_URL   = '/api/validate-license';
 
-const VERIFY_ENDPOINT = '/api/verify-license';
+// URLs de checkout
+const CHECKOUT_MONTHLY = 'https://molvicstudios.lemonsqueezy.com/checkout/buy/1451042?checkout[custom][product]=gestorai';
+const CHECKOUT_YEARLY  = 'https://molvicstudios.lemonsqueezy.com/checkout/buy/1451025?checkout[custom][product]=gestorai';
 
 const FREE_LIMITS = {
   facturas:  { max: 3,  period: 'monthly' },
   contratos: { max: 1,  period: 'monthly' },
   ia:        { max: 5,  period: 'daily'   }
 };
-
-// Cache TTL: monthly → 24h, annual → 7 days
-function getCacheTTL(plan) {
-  if (plan === 'annual') return 7 * 24 * 60 * 60 * 1000;
-  return 24 * 60 * 60 * 1000;
-}
 
 function getCounterKey(action) {
   const now = new Date();
@@ -35,35 +29,35 @@ function getCounterKey(action) {
   return `gestorai_monthly_${action}_${month}`;
 }
 
-function isCacheValid() {
-  const verifiedAt = localStorage.getItem(KEYS.verified_at);
-  const plan = localStorage.getItem(KEYS.plan);
-  if (!verifiedAt || !plan) return false;
-  const ttl = getCacheTTL(plan);
-  return (Date.now() - parseInt(verifiedAt, 10)) < ttl;
-}
+// ── Migrar claves antiguas si existen ─────────────────────────────────────────
+(function migrateOldKeys() {
+  const oldKey = localStorage.getItem('gestorai_pro_license_key');
+  if (oldKey && !localStorage.getItem(LS_LICENSE_KEY)) {
+    localStorage.setItem(LS_LICENSE_KEY, oldKey);
+    localStorage.setItem(LS_PLAN_KEY, 'pro');
+    localStorage.setItem(LS_BILLING_KEY, 'mensual');
+    // Clean up old keys
+    ['gestorai_pro_license_key', 'gestorai_pro_plan', 'gestorai_pro_status',
+     'gestorai_pro_verified_at', 'gestorai_pro_expires'].forEach(k => localStorage.removeItem(k));
+  }
+})();
 
+// ── LicenseSystem ─────────────────────────────────────────────────────────────
 const LicenseSystem = {
   isPro() {
-    const key = localStorage.getItem(KEYS.license_key);
-    const plan = localStorage.getItem(KEYS.plan);
-    const status = localStorage.getItem(KEYS.status);
-    if (!key || !plan) return false;
-    if (status !== 'active' && status !== 'on_trial') return false;
-    // Check expiry
-    const expires = localStorage.getItem(KEYS.expires);
-    if (expires && new Date(expires) < new Date()) return false;
-    return true;
+    return localStorage.getItem(LS_PLAN_KEY) === 'pro';
   },
 
   getPlan() {
-    if (!this.isPro()) return null;
-    return localStorage.getItem(KEYS.plan);
+    return localStorage.getItem(LS_PLAN_KEY) || 'free';
+  },
+
+  getBillingPeriod() {
+    return localStorage.getItem(LS_BILLING_KEY) || null;
   },
 
   getStatus() {
-    if (!this.isPro()) return null;
-    return localStorage.getItem(KEYS.status);
+    return this.isPro() ? 'active' : null;
   },
 
   async activate(licenseKey) {
@@ -72,54 +66,67 @@ const LicenseSystem = {
     }
 
     try {
-      const res = await fetch(VERIFY_ENDPOINT, {
+      const res = await fetch(VALIDATE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ license_key: licenseKey.trim() })
+        body: JSON.stringify({ licenseKey: licenseKey.trim() })
       });
 
       const data = await res.json();
 
-      if (!data.valid) {
-        const messages = {
-          missing_key: 'Clave no proporcionada.',
-          inactive: 'La licencia está inactiva o cancelada.',
-          server_error: 'Error del servidor. Inténtalo de nuevo.'
-        };
-        return {
-          success: false,
-          error: messages[data.reason] || 'Clave de licencia no válida.'
-        };
+      if (data.valid) {
+        localStorage.setItem(LS_PLAN_KEY,    'pro');
+        localStorage.setItem(LS_LICENSE_KEY, licenseKey.trim());
+        localStorage.setItem(LS_BILLING_KEY, data.billingPeriod || 'mensual');
+        localStorage.setItem(LS_LAST_CHECK,  String(Date.now()));
+        return { success: true, plan: 'pro', billingPeriod: data.billingPeriod };
       }
 
-      localStorage.setItem(KEYS.license_key, licenseKey.trim());
-      localStorage.setItem(KEYS.plan, data.plan);
-      localStorage.setItem(KEYS.status, data.status);
-      localStorage.setItem(KEYS.verified_at, Date.now().toString());
-      if (data.expires) localStorage.setItem(KEYS.expires, data.expires);
-
-      return { success: true, plan: data.plan };
+      return { success: false, error: data.error || 'Clave de licencia inválida o expirada.' };
     } catch {
       return { success: false, error: 'Error de conexión. Comprueba tu internet.' };
     }
   },
 
   deactivate() {
-    Object.values(KEYS).forEach(k => localStorage.removeItem(k));
+    localStorage.removeItem(LS_PLAN_KEY);
+    localStorage.removeItem(LS_LICENSE_KEY);
+    localStorage.removeItem(LS_BILLING_KEY);
+    localStorage.removeItem(LS_LAST_CHECK);
   },
 
-  async refresh() {
-    const key = localStorage.getItem(KEYS.license_key);
-    if (!key) return false;
-    if (isCacheValid()) return this.isPro();
+  openCheckout(period = 'mensual') {
+    const url = period === 'anual' ? CHECKOUT_YEARLY : CHECKOUT_MONTHLY;
+    window.open(url, '_blank');
+  },
+
+  // Revalidar cada 7 días en segundo plano
+  async validateOnLoad() {
+    const key         = localStorage.getItem(LS_LICENSE_KEY);
+    const lastChecked = parseInt(localStorage.getItem(LS_LAST_CHECK) || '0');
+    const now         = Date.now();
+    const sevenDays   = 7 * 24 * 60 * 60 * 1000;
+
+    if (!key) return; // Free user
+
+    if (now - lastChecked < sevenDays) return; // Aún válido
+
     const result = await this.activate(key);
-    return result.success;
+    if (!result.success) {
+      this.deactivate();
+      console.warn('[GestorAI] Licencia inválida — plan degradado a Free.');
+    }
+  },
+
+  // Alias para compatibilidad
+  async refresh() {
+    return this.validateOnLoad();
   },
 
   canDo(action) {
     if (this.isPro()) return true;
     const limit = FREE_LIMITS[action];
-    if (!limit) return false; // Unknown action → Pro-only
+    if (!limit) return false;
     const counterKey = getCounterKey(action);
     if (!counterKey) return false;
     const used = parseInt(localStorage.getItem(counterKey) || '0', 10);
@@ -144,5 +151,14 @@ const LicenseSystem = {
     return Math.max(0, limit.max - used);
   }
 };
+
+// ── Named exports ─────────────────────────────────────────────────────────────
+export function getCurrentPlan() { return LicenseSystem.getPlan(); }
+export function isPro() { return LicenseSystem.isPro(); }
+export function getBillingPeriod() { return LicenseSystem.getBillingPeriod(); }
+export async function activateLicense(key) { return LicenseSystem.activate(key); }
+export function deactivateLicense() { return LicenseSystem.deactivate(); }
+export function openCheckout(period) { return LicenseSystem.openCheckout(period); }
+export async function validateOnLoad() { return LicenseSystem.validateOnLoad(); }
 
 export default LicenseSystem;
