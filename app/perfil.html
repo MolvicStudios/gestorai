@@ -12,7 +12,7 @@
 </head>
 <body>
   <div class="app-layout">
-    <!-- Sidebar loaded by app shell -->
+    <aside class="sidebar" id="sidebar"></aside>
     <main class="app-main">
       <div class="container" style="max-width:720px; padding:2rem 1rem;">
         <a href="/app/dashboard.html" style="display:inline-flex; align-items:center; gap:.4rem; color:var(--color-text-muted); text-decoration:none; font-size:.9rem; margin-bottom:1rem;">&larr; Volver al Dashboard</a>
@@ -186,12 +186,14 @@
   </div>
 
   <script type="module">
+    import { initAppShell, updatePlanBadge } from '/js/app-shell.js';
     import { initAuth, initAppPage, getUser, updateProfile, supabase as sb } from '/js/auth.js';
     import { initChatbot } from '/js/chatbot.js';
     import { renderCCAAGrid, renderRegimenPanel, saveCCAAToProfile } from '/js/ccaa-selector.js';
     import LicenseSystem from '/js/license.js';
     import { showUpgradeModal } from '/js/upgrade-modal.js';
 
+    initAppShell();
     await initAuth();
     initChatbot();
     await initAppPage();
@@ -219,10 +221,12 @@
     });
 
     // Hide upgrade if already Pro
+    await LicenseSystem.refresh();
     if (LicenseSystem.isPro()) {
       document.getElementById('btn-upgrade').style.display = 'none';
       document.getElementById('user-plan').textContent = 'Pro ✨';
     }
+    updatePlanBadge(LicenseSystem.isPro());
     document.getElementById('btn-upgrade')?.addEventListener('click', () => {
       showUpgradeModal('facturas');
     });
@@ -239,8 +243,8 @@
         tipo_actividad: document.getElementById('pf-actividad').value,
         ccaa: selectedCcaa
       };
-      const ok = await updateProfile(updates);
-      if (ok) alert('Perfil actualizado correctamente.');
+      const { error } = await updateProfile(updates);
+      if (!error) alert('Perfil actualizado correctamente.');
       else alert('Error al guardar. Inténtalo de nuevo.');
     });
 

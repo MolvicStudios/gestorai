@@ -93,18 +93,39 @@ export function calcularCuotasSS(baseCotizacion, tipoContrato = 'indefinido') {
   const desempleoEmp = tipoContrato === 'temporal' ? es.desempleoTemporal : es.desempleoIndefinido;
   const desempleoTrab = tipoContrato === 'temporal' ? tr.desempleoTemporal : tr.desempleoIndefinido;
 
-  const cuotaEmpresa = redondear(baseCotizacion * (es.contingenciasComunes + desempleoEmp + es.fogasa + es.formacion + es.mei + es.accidentesTrabajo) / 100);
-  const cuotaTrabajador = redondear(baseCotizacion * (tr.contingenciasComunes + desempleoTrab + tr.formacion + tr.mei) / 100);
+  const empCC = redondear(baseCotizacion * es.contingenciasComunes / 100);
+  const empDesempleo = redondear(baseCotizacion * desempleoEmp / 100);
+  const empFogasa = redondear(baseCotizacion * es.fogasa / 100);
+  const empFormacion = redondear(baseCotizacion * es.formacion / 100);
+  const empMEI = redondear(baseCotizacion * es.mei / 100);
+  const empAT = redondear(baseCotizacion * es.accidentesTrabajo / 100);
+  const cuotaEmpresa = redondear(empCC + empDesempleo + empFogasa + empFormacion + empMEI + empAT);
+
+  const trabCC = redondear(baseCotizacion * tr.contingenciasComunes / 100);
+  const trabDesempleo = redondear(baseCotizacion * desempleoTrab / 100);
+  const trabFormacion = redondear(baseCotizacion * tr.formacion / 100);
+  const trabMEI = redondear(baseCotizacion * tr.mei / 100);
+  const cuotaTrabajador = redondear(trabCC + trabDesempleo + trabFormacion + trabMEI);
 
   return {
     baseCotizacion,
     empresa: {
       total: cuotaEmpresa,
-      porcentajeTotal: redondear(es.contingenciasComunes + desempleoEmp + es.fogasa + es.formacion + es.mei + es.accidentesTrabajo)
+      porcentajeTotal: redondear(es.contingenciasComunes + desempleoEmp + es.fogasa + es.formacion + es.mei + es.accidentesTrabajo),
+      contingencias_comunes: empCC,
+      desempleo: empDesempleo,
+      fogasa: empFogasa,
+      formacion: empFormacion,
+      mei: empMEI,
+      at_ep: empAT
     },
     trabajador: {
       total: cuotaTrabajador,
-      porcentajeTotal: redondear(tr.contingenciasComunes + desempleoTrab + tr.formacion + tr.mei)
+      porcentajeTotal: redondear(tr.contingenciasComunes + desempleoTrab + tr.formacion + tr.mei),
+      contingencias_comunes: trabCC,
+      desempleo: trabDesempleo,
+      formacion: trabFormacion,
+      mei: trabMEI
     }
   };
 }
@@ -112,29 +133,58 @@ export function calcularCuotasSS(baseCotizacion, tipoContrato = 'indefinido') {
 /**
  * Calcular finiquito
  */
-export function calcularFiniquito({ salarioBrutoMensual, fechaAlta, fechaBaja, diasVacacionesPendientes = 0, pagasExtras = 2 }) {
-  const alta = new Date(fechaAlta);
-  const baja = new Date(fechaBaja);
+export function calcularFiniquito({
+  salarioBrutoMensual,
+  fechaAlta, fechaBaja,          // legacy params
+  fechaInicio, fechaFin,          // new params from finiquito.html
+  diasVacacionesPendientes = 0,
+  diasVacacionesTotales = 30,
+  diasVacacionesDisfrutados = 0,
+  pagasExtras = 2,
+  numPagas = 14,
+  motivo = 'baja_voluntaria'
+}) {
+  // Normalise date params (accept both old and new names)
+  const alta = new Date(fechaInicio || fechaAlta);
+  const baja = new Date(fechaFin || fechaBaja);
   const salarioDiario = salarioBrutoMensual / 30;
 
-  // Días del mes de baja
+  // Días trabajados en el mes de baja
   const diaDelMes = baja.getDate();
-  const salarioMesBaja = redondear(salarioDiario * diaDelMes);
+  const salarioDiasTrabajados = redondear(salarioDiario * diaDelMes);
 
-  // Vacaciones no disfrutadas
-  const vacaciones = redondear(salarioDiario * diasVacacionesPendientes);
+  // Vacaciones no disfrutadas — calculate from totals if individual pending not given
+  const diasPendientes = diasVacacionesPendientes || Math.max(0, diasVacacionesTotales - diasVacacionesDisfrutados);
+  const vacacionesPendientes = redondear(salarioDiario * diasPendientes);
 
-  // Parte proporcional pagas extra
+  // Parte proporcional pagas extra (only for 14-pay schemes)
+  const efectivoPagas = numPagas === 12 ? 0 : (pagasExtras || 2);
   const diasDesdeUltimaPaga = diasDesde(ultimaPagaExtra(baja), baja);
-  const parteProporcionalPagas = redondear((salarioBrutoMensual / 365) * diasDesdeUltimaPaga * pagasExtras);
+  const pagasExtrasImporte = redondear((salarioBrutoMensual / 365) * diasDesdeUltimaPaga * efectivoPagas);
 
-  const totalBruto = redondear(salarioMesBaja + vacaciones + parteProporcionalPagas);
+  // Indemnización según motivo
+  const antiguedadDias = diasDesde(alta, baja);
+  const salarioDiarioAnual = (salarioBrutoMensual * 12) / 365;
+  let indemnizacion = 0;
+  if (motivo === 'despido_improcedente') {
+    indemnizacion = redondear(salarioDiarioAnual * 33 * antiguedadDias / 365);
+  } else if (motivo === 'despido_procedente' || motivo === 'ere') {
+    indemnizacion = redondear(salarioDiarioAnual * 20 * antiguedadDias / 365);
+  } else if (motivo === 'fin_contrato') {
+    indemnizacion = redondear(salarioDiarioAnual * 12 * antiguedadDias / 365);
+  }
+
+  const totalBruto = redondear(salarioDiasTrabajados + vacacionesPendientes + pagasExtrasImporte + indemnizacion);
 
   return {
-    salarioMesBaja,
-    vacaciones,
-    diasVacacionesPendientes,
-    parteProporcionalPagas,
+    salarioDiasTrabajados,
+    salarioMesBaja: salarioDiasTrabajados, // legacy alias
+    vacacionesPendientes,
+    vacaciones: vacacionesPendientes,       // legacy alias
+    diasVacacionesPendientes: diasPendientes,
+    pagasExtras: pagasExtrasImporte,
+    parteProporcionalPagas: pagasExtrasImporte, // legacy alias
+    indemnizacion,
     totalBruto
   };
 }

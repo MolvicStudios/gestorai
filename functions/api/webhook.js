@@ -1,13 +1,14 @@
 // functions/api/webhook.js — Cloudflare Pages Function
 // Lemon Squeezy webhook endpoint for GestorAI.pro
 
-const LS_WEBHOOK_SECRET = 'gfdsfgsdfagergads';
-
-export async function onRequestPost({ request }) {
+export async function onRequestPost({ request, env }) {
   const body      = await request.text();
   const signature = request.headers.get('x-signature') || '';
 
-  const valid = await verifySignature(body, signature, LS_WEBHOOK_SECRET);
+  const secret = env.LS_WEBHOOK_SECRET;
+  if (!secret) return new Response('Server config error', { status: 500 });
+
+  const valid = await verifySignature(body, signature, secret);
   if (!valid) return new Response('Unauthorized', { status: 401 });
 
   let event;

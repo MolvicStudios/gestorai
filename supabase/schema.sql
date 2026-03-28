@@ -321,3 +321,28 @@ LEFT JOIN public.subscriptions s ON s.user_id = p.id;
 
 -- Política de seguridad para la vista
 ALTER VIEW public.resumen_usuario OWNER TO postgres;
+
+-- ─── Tabla clientes (BUG-05: missing table referenced by app) ───
+CREATE TABLE IF NOT EXISTS public.clientes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  nombre TEXT NOT NULL,
+  nif TEXT,
+  email TEXT,
+  telefono TEXT,
+  direccion TEXT,
+  codigo_postal TEXT,
+  ciudad TEXT,
+  notas TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX idx_clientes_user_id ON public.clientes(user_id);
+
+ALTER TABLE public.clientes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage their own clients"
+  ON public.clientes FOR ALL
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);

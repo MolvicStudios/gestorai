@@ -1,7 +1,5 @@
 // js/cookie-banner.js — RGPD/LOPDGDD banner
-// Basado en portfolio MolvicStudios
 const LS_KEY = 'gestorai_cookies_consent';
-const ADSENSE_ID = 'ca-pub-1513893788851225';
 
 export function initCookieBanner() {
   if (localStorage.getItem(LS_KEY)) return;
@@ -35,27 +33,12 @@ export function initCookieBanner() {
   document.getElementById('cookie-accept').addEventListener('click', () => {
     localStorage.setItem(LS_KEY, 'all');
     banner.remove();
-    loadAdsense();
   });
 
   document.getElementById('cookie-reject').addEventListener('click', () => {
     localStorage.setItem(LS_KEY, 'essential');
     banner.remove();
   });
-}
-
-function loadAdsense() {
-  // Solo cargar AdSense si el usuario aceptó todas las cookies
-  // y tiene plan Free (verificar externamente)
-  if (localStorage.getItem(LS_KEY) !== 'all') return;
-  if (document.querySelector('script[data-ad-client]')) return;
-
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_ID}`;
-  script.crossOrigin = 'anonymous';
-  script.dataset.adClient = ADSENSE_ID;
-  document.head.appendChild(script);
 }
 
 export function hasConsentForAds() {

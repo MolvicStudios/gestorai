@@ -14,35 +14,12 @@
 <body>
   <div class="app-layout">
     <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <img src="/assets/logo.svg" alt="GestorAI" class="sidebar-logo" width="32" height="32">
-        <span class="sidebar-brand">GestorAI</span>
-        <span style="display:block;font-size:11px;font-weight:400;opacity:0.6;letter-spacing:0.03em;line-height:1;">by <a href="https://molvicstudios.pro" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">MolvicStudios.pro</a></span>
-      </div>
-        <a href="/app/dashboard.html" class="active">📊 Dashboard</a>
-        <div class="nav-section">Gestión</div>
-        <a href="/app/facturas/index.html">🧾 Facturas</a>
-        <a href="/app/fiscal/index.html">📋 Fiscal</a>
-        <a href="/app/contratos/index.html">📝 Contratos</a>
-        <a href="/app/laboral/index.html">👥 Laboral</a>
-        <div class="nav-section">Cuenta</div>
-        <a href="#" id="nav-config">⚙️ Configuración</a>
-        <a href="#" id="nav-logout">🚪 Cerrar sesión</a>
-      </nav>
-      <div class="sidebar-footer">
-        <span id="plan-badge" class="badge badge-free">Free</span>
-        <button id="btn-tema-sidebar" style="background:none; border:none; cursor:pointer; font-size:1.1rem; margin-left:0.5rem;" aria-label="Cambiar tema">
-          <span data-tema-icon>☀️</span>
-        </button>
-      </div>
-    </aside>
+    <aside class="sidebar" id="sidebar"></aside>
 
     <!-- Main -->
     <main class="app-main">
       <div class="app-topbar">
         <div>
-          <button id="btn-menu" style="display:none; background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--color-text);" aria-label="Menú">☰</button>
           <h1>Dashboard</h1>
           <p style="color:var(--color-text-muted); margin:0;">Bienvenido, <span id="user-name">usuario</span></p>
         </div>
@@ -118,40 +95,19 @@
     </main>
   </div>
 
-  <!-- Bottom nav (mobile) -->
-  <nav class="bottom-nav">
-    <div class="bottom-nav-items">
-      <a href="/app/dashboard.html" class="bottom-nav-item active">
-        <span class="nav-icon">📊</span> Inicio
-      </a>
-      <a href="/app/facturas/index.html" class="bottom-nav-item">
-        <span class="nav-icon">🧾</span> Facturas
-      </a>
-      <a href="/app/fiscal/index.html" class="bottom-nav-item">
-        <span class="nav-icon">📋</span> Fiscal
-      </a>
-      <a href="/app/contratos/index.html" class="bottom-nav-item">
-        <span class="nav-icon">📝</span> Contratos
-      </a>
-      <a href="/app/laboral/index.html" class="bottom-nav-item">
-        <span class="nav-icon">👥</span> Laboral
-      </a>
-    </div>
-  </nav>
-
 
 
   <script type="module">
-    import { initTema, ciclarTema } from '/js/color-mode.js';
+    import { initAppShell, updatePlanBadge } from '/js/app-shell.js';
     import { initAuth, initAppPage, getUser, supabase as sb } from '/js/auth.js';
     import { initChatbot } from '/js/chatbot.js';
     import { initCookieBanner } from '/js/cookie-banner.js';
     import LicenseSystem from '/js/license.js';
     import { showUpgradeModal } from '/js/upgrade-modal.js';
+
+    initAppShell();
     await initAuth();
     initChatbot();
-
-    initTema();
     initCookieBanner();
 
     // Auth guard
@@ -163,45 +119,29 @@
     await LicenseSystem.refresh();
     const pro = LicenseSystem.isPro();
     const plan = pro ? 'pro' : 'free';
-    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
+    updatePlanBadge(pro);
 
     if (!pro) {
       document.getElementById('upgrade-banner').style.display = 'flex';
     }
 
-    // Stats
-    if (profile) {
-      document.getElementById('stat-facturado').textContent = `${Number(profile.facturado_anio || 0).toLocaleString('es-ES')} €`;
-      document.getElementById('stat-facturas').textContent = profile.total_facturas || 0;
-      const consultasHoy = profile.consultas_ia_hoy || 0;
+    // Stats — load from resumen_usuario view (BUG-06 fix)
+    const { data: resumen } = await sb.from('resumen_usuario').select('*').eq('user_id', user.id).single();
+    if (resumen) {
+      document.getElementById('stat-facturado').textContent = `${Number(resumen.facturado_anio || 0).toLocaleString('es-ES')} €`;
+      document.getElementById('stat-facturas').textContent = resumen.total_facturas || 0;
+      const consultasHoy = resumen.consultas_ia_hoy || 0;
       const maxConsultas = plan === 'pro' ? '∞' : '5';
       document.getElementById('stat-consultas').textContent = `${consultasHoy} / ${maxConsultas}`;
       document.getElementById('ia-counter').textContent = `IA: ${consultasHoy}/${maxConsultas}`;
       if (plan === 'pro') document.getElementById('stat-consultas-hint').textContent = 'Plan Pro: ilimitadas';
     }
 
-    // Theme
-    document.getElementById('btn-tema-sidebar').addEventListener('click', ciclarTema);
-
-    // Logout
-    document.getElementById('nav-logout').addEventListener('click', async e => { e.preventDefault(); await sb.auth.signOut(); window.location.href = '/'; });
+    document.getElementById('user-name').textContent = resumen?.nombre || user.email.split('@')[0];
 
     // Upgrade
     document.getElementById('btn-upgrade')?.addEventListener('click', () => {
       showUpgradeModal('facturas');
-    });
-
-
-    // Mobile menu
-    const sidebar = document.getElementById('sidebar');
-    const btnMenu = document.getElementById('btn-menu');
-    if (window.innerWidth <= 768) btnMenu.style.display = 'block';
-    btnMenu.addEventListener('click', () => sidebar.classList.toggle('open'));
-
-    // Config nav — now goes to profile page
-    document.getElementById('nav-config')?.addEventListener('click', e => {
-      e.preventDefault();
-      window.location.href = '/app/perfil.html';
     });
   </script>
 </body>

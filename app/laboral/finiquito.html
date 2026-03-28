@@ -13,20 +13,7 @@
 </head>
 <body>
   <div class="app-layout">
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <img src="/assets/logo.svg" alt="GestorAI" class="sidebar-logo" width="32" height="32">
-        <span class="sidebar-brand">GestorAI</span>
-        <span style="display:block;font-size:11px;font-weight:400;opacity:0.6;letter-spacing:0.03em;line-height:1;">by <a href="https://molvicstudios.pro" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">MolvicStudios.pro</a></span>
-      </div>
-        <a href="/app/dashboard.html">📊 Dashboard</a>
-        <div class="nav-section">Gestión</div>
-        <a href="/app/facturas/index.html">🧾 Facturas</a>
-        <a href="/app/fiscal/index.html">📋 Fiscal</a>
-        <a href="/app/contratos/index.html">📝 Contratos</a>
-        <a href="/app/laboral/index.html" class="active">👥 Laboral</a>
-      </nav>
-    </aside>
+    <aside class="sidebar" id="sidebar"></aside>
     <main class="app-main">
       <div class="app-topbar">
         <div>
@@ -122,13 +109,13 @@
   </div>
 
   <script type="module">
-    import { initTema } from '/js/color-mode.js';
+    import { initAppShell } from '/js/app-shell.js';
     import { initAuth, getUser } from '/js/auth.js';
     import { initChatbot } from '/js/chatbot.js';
     import { calcularFiniquito } from '/js/fiscal/calculos-ss.js';
     import { askIA, PROMPTS } from '/js/ia-client.js';
 
-    initTema();
+    initAppShell();
     await initAuth();
     initChatbot();
 
@@ -204,7 +191,7 @@
           userPrompt: pregunta,
           modulo: 'laboral'
         });
-        respDiv.textContent = resp;
+        respDiv.textContent = resp.success ? resp.content : (resp.message || 'Error al consultar IA');
       } catch (err) {
         respDiv.textContent = 'Error: ' + err.message;
       }

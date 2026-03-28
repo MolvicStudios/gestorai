@@ -12,6 +12,7 @@
 </head>
 <body>
   <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
     <main class="app-main">
       <div class="container" style="max-width:600px; padding:2rem 1rem;">
         <a href="/app/clientes/" style="color:var(--color-text-muted); font-size:.9rem; text-decoration:none;">← Volver a clientes</a>
@@ -61,9 +62,11 @@
   </div>
 
   <script type="module">
+    import { initAppShell } from '/js/app-shell.js';
     import { initAuth, initAppPage, getUser, supabase as sb } from '/js/auth.js';
     import { initChatbot } from '/js/chatbot.js';
 
+    initAppShell();
     await initAuth();
     initChatbot();
     await initAppPage();

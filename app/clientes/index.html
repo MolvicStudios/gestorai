@@ -12,6 +12,7 @@
 </head>
 <body>
   <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
     <main class="app-main">
       <div class="container" style="max-width:900px; padding:2rem 1rem;">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem;">
@@ -39,9 +40,11 @@
   </div>
 
   <script type="module">
+    import { initAppShell } from '/js/app-shell.js';
     import { initAuth, initAppPage, getUser, supabase as sb } from '/js/auth.js';
     import { initChatbot } from '/js/chatbot.js';
 
+    initAppShell();
     await initAuth();
     initChatbot();
     await initAppPage();

@@ -1,13 +1,21 @@
 // functions/api/validate-license.js — Cloudflare Pages Function
 // Validates Lemon Squeezy license keys for GestorAI.pro
 
-export async function onRequestPost({ request }) {
-  const corsHeaders = {
-    'Access-Control-Allow-Origin':  '*',
+const ALLOWED_ORIGIN = 'https://gestorai.pro';
+
+function corsHeaders(request) {
+  const origin = request?.headers?.get('Origin') || '';
+  const allow = origin === ALLOWED_ORIGIN ? ALLOWED_ORIGIN : ALLOWED_ORIGIN;
+  return {
+    'Access-Control-Allow-Origin':  allow,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Content-Type':                 'application/json',
   };
+}
+
+export async function onRequestPost({ request }) {
+  const headers = corsHeaders(request);
 
   let licenseKey;
   try {
@@ -16,14 +24,14 @@ export async function onRequestPost({ request }) {
   } catch {
     return new Response(
       JSON.stringify({ valid: false, error: 'Solicitud inválida' }),
-      { status: 400, headers: corsHeaders }
+      { status: 400, headers }
     );
   }
 
   if (!licenseKey) {
     return new Response(
       JSON.stringify({ valid: false, error: 'No se proporcionó clave de licencia' }),
-      { status: 400, headers: corsHeaders }
+      { status: 400, headers }
     );
   }
 
@@ -46,22 +54,18 @@ export async function onRequestPost({ request }) {
       plan:          valid ? 'pro' : 'free',
       billingPeriod: valid ? billingPeriod : null,
       email:         data?.license_key?.user_email || null,
-    }), { headers: corsHeaders });
+    }), { headers });
 
   } catch (err) {
     return new Response(
       JSON.stringify({ valid: false, error: err.message }),
-      { status: 500, headers: corsHeaders }
+      { status: 500, headers }
     );
   }
 }
 
-export async function onRequestOptions() {
+export async function onRequestOptions({ request }) {
   return new Response(null, {
-    headers: {
-      'Access-Control-Allow-Origin':  '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    }
+    headers: corsHeaders(request)
   });
 }
